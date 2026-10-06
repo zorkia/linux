@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LAB 08 - Linux Environment Variables และ Bash Shell</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../index.html">Docker Linux Lab</a>
+    <span class="subtitle">Raspberry Pi Preparation</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Site navigation">
+      <a class="" href="../index.html">Docker Linux Lab</a>
+<a class="" href="00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
+<a class="" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
+<a class="" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
+<a class="" href="03-lab-03-linux-users-groups-ownership-และ-permissions.html">LAB 03 - Linux Users, Groups, Ownership และ Permissions</a>
+<a class="" href="04-lab-04-linux-package-management.html">LAB 04 - Linux Package Management</a>
+<a class="" href="05-lab-05-linux-processes-และ-resource-monitoring.html">LAB 05 - Linux Processes และ Resource Monitoring</a>
+<a class="" href="06-lab-06-linux-networking.html">LAB 06 - Linux Networking</a>
+<a class="" href="07-lab-07-linux-pipes-redirects-และ-text-processing.html">LAB 07 - Linux Pipes, Redirects และ Text Processing</a>
+<a class="active" href="08-lab-08-linux-environment-variables-และ-bash-shell.html">LAB 08 - Linux Environment Variables และ Bash Shell</a>
+<a class="" href="09-lab-09-bash-shell-script.html">LAB 09 - Bash Shell Script</a>
+<a class="" href="10-lab-10-python-บน-linux.html">LAB 10 - Python บน Linux</a>
+<a class="" href="11-lab-11-nginx-web-server.html">LAB 11 - Nginx Web Server</a>
+<a class="" href="12-lab-12-sqlite-database.html">LAB 12 - SQLite Database</a>
+<a class="" href="13-lab-13-mosquitto-mqtt-broker.html">LAB 13 - Mosquitto MQTT Broker</a>
+<a class="" href="14-lab-14-mqtt-json-and-topic-design.html">LAB 14 - MQTT JSON and Topic Design</a>
+<a class="" href="15-lab-15-python-mqtt-publisher.html">LAB 15 - Python MQTT Publisher</a>
+<a class="" href="16-lab-16-python-mqtt-subscriber-to-sqlite.html">LAB 16 - Python MQTT Subscriber to SQLite</a>
+<a class="" href="17-lab-17-node-red.html">LAB 17 - Node-RED</a>
+<a class="" href="18-lab-18-node-red-and-mqtt.html">LAB 18 - Node-RED and MQTT</a>
+<a class="" href="19-lab-19-node-red-http-dashboard.html">LAB 19 - Node-RED HTTP Dashboard</a>
+<a class="" href="20-lab-20-integrated-iot-linux-stack.html">LAB 20 - Integrated IoT Linux Stack</a>
+    </nav>
+    <main class="content">
+      <h1 id="lab-08-linux-environment-variables-และ-bash-shell">LAB 08 - Linux Environment Variables และ Bash Shell</h1>
+<nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="07-lab-07-linux-pipes-redirects-และ-text-processing.html">ก่อนหน้า: LAB 07 - Linux Pipes, Redirects และ Text Processing</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="09-lab-09-bash-shell-script.html">ถัดไป: LAB 09 - Bash Shell Script</a></nav>
+<h2 id="วัตถุประสงค์">วัตถุประสงค์</h2>
+<p>เข้าใจ Shell, Environment Variables, PATH, command history, alias และ <code>.bashrc</code></p>
+<h2 id="เริ่มต้น">เริ่มต้น</h2>
+<pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
+<pre class="language-bash"><code>su - piuser</code></pre>
+<h2 id="1-shell">1. Shell</h2>
+<pre class="language-bash"><code>echo $SHELL</code></pre>
+<p>ตรวจ Bash:</p>
+<pre class="language-bash"><code>bash --version</code></pre>
+<h2 id="2-environment-variables">2. Environment Variables</h2>
+<pre class="language-bash"><code>env</code></pre>
+<p>ดูค่าบางตัว:</p>
+<pre class="language-bash"><code>echo $HOME
+echo $USER
+echo $PATH</code></pre>
+<h2 id="3-สร้าง-variable">3. สร้าง Variable</h2>
+<pre class="language-bash"><code>device_id=&quot;ESP32-001&quot;
+echo $device_id</code></pre>
+<p>ตัวแปรนี้เป็น Shell Variable ใน session ปัจจุบัน</p>
+<h2 id="4-export">4. export</h2>
+<pre class="language-bash"><code>export MQTT_TOPIC=&quot;pkru/iot/001&quot;
+echo $MQTT_TOPIC</code></pre>
+<p>ทดสอบ Child Shell:</p>
+<pre class="language-bash"><code>bash
+echo $MQTT_TOPIC
+exit</code></pre>
+<h2 id="5-path">5. PATH</h2>
+<pre class="language-bash"><code>echo $PATH</code></pre>
+<p>ตรวจคำสั่ง:</p>
+<pre class="language-bash"><code>which bash
+which python3
+which nano</code></pre>
+<h2 id="6-history">6. History</h2>
+<pre class="language-bash"><code>history</code></pre>
+<p>แสดงบางส่วน:</p>
+<pre class="language-bash"><code>history | tail</code></pre>
+<h2 id="7-alias">7. Alias</h2>
+<pre class="language-bash"><code>alias ll=&#x27;ls -lah&#x27;
+ll</code></pre>
+<p>Alias นี้หายเมื่อ session สิ้นสุดถ้าไม่บันทึก</p>
+<h2 id="8-bashrc">8. .bashrc</h2>
+<p>เปิด:</p>
+<pre class="language-bash"><code>nano ~/.bashrc</code></pre>
+<p>เพิ่มท้ายไฟล์:</p>
+<pre class="language-bash"><code>alias ll=&#x27;ls -lah&#x27;
+export LAB_NAME=&quot;Raspberry Pi Linux Lab&quot;</code></pre>
+<p>โหลดใหม่:</p>
+<pre class="language-bash"><code>source ~/.bashrc</code></pre>
+<p>ทดสอบ:</p>
+<pre class="language-bash"><code>ll
+echo $LAB_NAME</code></pre>
+<h2 id="9-environment-สำหรับ-iot">9. Environment สำหรับ IoT</h2>
+<p>เพิ่มชั่วคราว:</p>
+<pre class="language-bash"><code>export DEVICE_ID=&quot;001&quot;
+export MQTT_BROKER=&quot;test.mosquitto.org&quot;
+export MQTT_TOPIC=&quot;pkru/iot/$DEVICE_ID&quot;</code></pre>
+<p>ตรวจ:</p>
+<pre class="language-bash"><code>echo $DEVICE_ID
+echo $MQTT_BROKER
+echo $MQTT_TOPIC</code></pre>
+<h2 id="10-unset">10. unset</h2>
+<pre class="language-bash"><code>unset DEVICE_ID
+echo $DEVICE_ID</code></pre>
+<h2 id="แบบฝึกหัด">แบบฝึกหัด</h2>
+<p>สร้างตัวแปร:</p>
+<pre class="language-text"><code>SITE=PKRU
+DEVICE=ESP32-01
+LOCATION=LAB</code></pre>
+<p>สร้าง <code>TOPIC</code> ให้ได้:</p>
+<pre class="language-text"><code>PKRU/ESP32-01/LAB</code></pre>
+<p>โดยประกอบค่าจากตัวแปร</p>
+<h2 id="คำถามท้าย-lab">คำถามท้าย LAB</h2>
+<ol>
+<li>Shell คืออะไร</li>
+<li>Environment Variable คืออะไร</li>
+<li><code>export</code> ทำอะไร</li>
+<li>PATH มีหน้าที่อะไร</li>
+<li><code>.bashrc</code> ถูกใช้เพื่ออะไร</li>
+</ol>
+<p><strong>LAB ถัดไป: LAB 09 - Bash Shell Script</strong></p>
+    </main>
+  </div>
+</body>
+</html>

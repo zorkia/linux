@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LAB 03 - Linux Users, Groups, Ownership และ Permissions</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../index.html">Docker Linux Lab</a>
+    <span class="subtitle">Raspberry Pi Preparation</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Site navigation">
+      <a class="" href="../index.html">Docker Linux Lab</a>
+<a class="" href="00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
+<a class="" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
+<a class="" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
+<a class="active" href="03-lab-03-linux-users-groups-ownership-และ-permissions.html">LAB 03 - Linux Users, Groups, Ownership และ Permissions</a>
+<a class="" href="04-lab-04-linux-package-management.html">LAB 04 - Linux Package Management</a>
+<a class="" href="05-lab-05-linux-processes-และ-resource-monitoring.html">LAB 05 - Linux Processes และ Resource Monitoring</a>
+<a class="" href="06-lab-06-linux-networking.html">LAB 06 - Linux Networking</a>
+<a class="" href="07-lab-07-linux-pipes-redirects-และ-text-processing.html">LAB 07 - Linux Pipes, Redirects และ Text Processing</a>
+<a class="" href="08-lab-08-linux-environment-variables-และ-bash-shell.html">LAB 08 - Linux Environment Variables และ Bash Shell</a>
+<a class="" href="09-lab-09-bash-shell-script.html">LAB 09 - Bash Shell Script</a>
+<a class="" href="10-lab-10-python-บน-linux.html">LAB 10 - Python บน Linux</a>
+<a class="" href="11-lab-11-nginx-web-server.html">LAB 11 - Nginx Web Server</a>
+<a class="" href="12-lab-12-sqlite-database.html">LAB 12 - SQLite Database</a>
+<a class="" href="13-lab-13-mosquitto-mqtt-broker.html">LAB 13 - Mosquitto MQTT Broker</a>
+<a class="" href="14-lab-14-mqtt-json-and-topic-design.html">LAB 14 - MQTT JSON and Topic Design</a>
+<a class="" href="15-lab-15-python-mqtt-publisher.html">LAB 15 - Python MQTT Publisher</a>
+<a class="" href="16-lab-16-python-mqtt-subscriber-to-sqlite.html">LAB 16 - Python MQTT Subscriber to SQLite</a>
+<a class="" href="17-lab-17-node-red.html">LAB 17 - Node-RED</a>
+<a class="" href="18-lab-18-node-red-and-mqtt.html">LAB 18 - Node-RED and MQTT</a>
+<a class="" href="19-lab-19-node-red-http-dashboard.html">LAB 19 - Node-RED HTTP Dashboard</a>
+<a class="" href="20-lab-20-integrated-iot-linux-stack.html">LAB 20 - Integrated IoT Linux Stack</a>
+    </nav>
+    <main class="content">
+      <h1 id="lab-03-linux-users-groups-ownership-และ-permissions">LAB 03 - Linux Users, Groups, Ownership และ Permissions</h1>
+<nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">ก่อนหน้า: LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="04-lab-04-linux-package-management.html">ถัดไป: LAB 04 - Linux Package Management</a></nav>
+<h2 id="วัตถุประสงค์">วัตถุประสงค์</h2>
+<p>ฝึกจัดการผู้ใช้ กลุ่ม เจ้าของไฟล์ และสิทธิ์แบบเดียวกับที่ต้องใช้บน Raspberry Pi จริง</p>
+<h2 id="เริ่มต้น-lab">เริ่มต้น LAB</h2>
+<p>บน Windows:</p>
+<pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
+<p>ภายใน Container:</p>
+<pre class="language-bash"><code>su - piuser
+whoami
+id
+groups</code></pre>
+<h2 id="1-อ่าน-permission">1. อ่าน Permission</h2>
+<pre class="language-bash"><code>cd ~
+mkdir -p permission-lab
+cd permission-lab
+touch test.txt
+ls -l test.txt</code></pre>
+<p>รูปแบบ:</p>
+<pre class="language-text"><code>-rw-r--r-- 1 piuser piuser ... test.txt
+│└┬┘└┬┘└┬┘
+│ │  │  └─ other
+│ │  └──── group
+│ └─────── owner
+└───────── file type</code></pre>
+<p><code>r=read</code>, <code>w=write</code>, <code>x=execute</code></p>
+<h2 id="2-ตรวจสอบ-user-group">2. ตรวจสอบ User/Group</h2>
+<pre class="language-bash"><code>whoami
+id
+groups
+getent passwd piuser
+getent group sudo</code></pre>
+<h2 id="3-chmod-แบบ-symbolic">3. chmod แบบ Symbolic</h2>
+<pre class="language-bash"><code>chmod u+x test.txt
+ls -l test.txt
+chmod g+w test.txt
+chmod o-r test.txt
+ls -l test.txt</code></pre>
+<h2 id="4-chmod-แบบ-numeric">4. chmod แบบ Numeric</h2>
+<pre class="language-text"><code>r = 4
+w = 2
+x = 1</code></pre>
+<p>ทดลอง:</p>
+<pre class="language-bash"><code>chmod 644 test.txt
+ls -l test.txt
+chmod 600 test.txt
+ls -l test.txt
+chmod 755 test.txt
+ls -l test.txt</code></pre>
+<p>ความหมาย:</p>
+<pre class="language-text"><code>644 = rw-r--r--
+600 = rw-------
+755 = rwxr-xr-x</code></pre>
+<h2 id="5-ownership">5. Ownership</h2>
+<p>สร้างไฟล์:</p>
+<pre class="language-bash"><code>touch owner-test.txt
+ls -l owner-test.txt</code></pre>
+<p>เปลี่ยนเจ้าของเป็น root:</p>
+<pre class="language-bash"><code>sudo chown root:root owner-test.txt
+ls -l owner-test.txt</code></pre>
+<p>คืนเจ้าของ:</p>
+<pre class="language-bash"><code>sudo chown piuser:piuser owner-test.txt</code></pre>
+<h2 id="6-สร้าง-group-ทดลอง">6. สร้าง Group ทดลอง</h2>
+<pre class="language-bash"><code>sudo groupadd iot
+sudo usermod -aG iot piuser
+getent group iot</code></pre>
+<blockquote>
+Group membership ใหม่จะมีผลเต็มที่หลังเริ่ม login session ใหม่
+</blockquote>
+<h2 id="7-permission-กับ-directory">7. Permission กับ Directory</h2>
+<pre class="language-bash"><code>mkdir shared
+chmod 700 shared
+ls -ld shared
+chmod 755 shared
+ls -ld shared</code></pre>
+<h2 id="8-script-และ-execute-permission">8. Script และ Execute Permission</h2>
+<pre class="language-bash"><code>cat &gt; hello.sh &lt;&lt;&#x27;EOF&#x27;
+#!/bin/bash
+echo &quot;Hello Linux&quot;
+EOF
+ls -l hello.sh
+./hello.sh</code></pre>
+<p>ครั้งแรกอาจพบ <code>Permission denied</code></p>
+<p>แก้ด้วย:</p>
+<pre class="language-bash"><code>chmod +x hello.sh
+./hello.sh</code></pre>
+<h2 id="แบบฝึกหัด">แบบฝึกหัด</h2>
+<p>สร้าง:</p>
+<pre class="language-text"><code>~/permission-lab/iot/
+├── config.txt
+├── data.txt
+└── run.sh</code></pre>
+<p>กำหนด:</p>
+<ul>
+<li><code>config.txt</code> = 600</li>
+<li><code>data.txt</code> = 644</li>
+<li><code>run.sh</code> = 755</li>
+</ul>
+<p>ตรวจด้วย:</p>
+<pre class="language-bash"><code>ls -l ~/permission-lab/iot</code></pre>
+<h2 id="คำถามท้าย-lab">คำถามท้าย LAB</h2>
+<ol>
+<li>owner, group และ other ต่างกันอย่างไร</li>
+<li><code>644</code>, <code>600</code>, <code>755</code> หมายถึงอะไร</li>
+<li><code>chmod</code> กับ <code>chown</code> ต่างกันอย่างไร</li>
+<li>ทำไม Shell Script ต้องมี Execute Permission</li>
+</ol>
+<p><strong>LAB ถัดไป: LAB 04 - Linux Package Management</strong></p>
+    </main>
+  </div>
+</body>
+</html>

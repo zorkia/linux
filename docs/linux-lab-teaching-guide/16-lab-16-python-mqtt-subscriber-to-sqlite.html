@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LAB 16 - Python MQTT Subscriber to SQLite</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../index.html">Docker Linux Lab</a>
+    <span class="subtitle">Raspberry Pi Preparation</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Site navigation">
+      <a class="" href="../index.html">Docker Linux Lab</a>
+<a class="" href="00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
+<a class="" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
+<a class="" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
+<a class="" href="03-lab-03-linux-users-groups-ownership-และ-permissions.html">LAB 03 - Linux Users, Groups, Ownership และ Permissions</a>
+<a class="" href="04-lab-04-linux-package-management.html">LAB 04 - Linux Package Management</a>
+<a class="" href="05-lab-05-linux-processes-และ-resource-monitoring.html">LAB 05 - Linux Processes และ Resource Monitoring</a>
+<a class="" href="06-lab-06-linux-networking.html">LAB 06 - Linux Networking</a>
+<a class="" href="07-lab-07-linux-pipes-redirects-และ-text-processing.html">LAB 07 - Linux Pipes, Redirects และ Text Processing</a>
+<a class="" href="08-lab-08-linux-environment-variables-และ-bash-shell.html">LAB 08 - Linux Environment Variables และ Bash Shell</a>
+<a class="" href="09-lab-09-bash-shell-script.html">LAB 09 - Bash Shell Script</a>
+<a class="" href="10-lab-10-python-บน-linux.html">LAB 10 - Python บน Linux</a>
+<a class="" href="11-lab-11-nginx-web-server.html">LAB 11 - Nginx Web Server</a>
+<a class="" href="12-lab-12-sqlite-database.html">LAB 12 - SQLite Database</a>
+<a class="" href="13-lab-13-mosquitto-mqtt-broker.html">LAB 13 - Mosquitto MQTT Broker</a>
+<a class="" href="14-lab-14-mqtt-json-and-topic-design.html">LAB 14 - MQTT JSON and Topic Design</a>
+<a class="" href="15-lab-15-python-mqtt-publisher.html">LAB 15 - Python MQTT Publisher</a>
+<a class="active" href="16-lab-16-python-mqtt-subscriber-to-sqlite.html">LAB 16 - Python MQTT Subscriber to SQLite</a>
+<a class="" href="17-lab-17-node-red.html">LAB 17 - Node-RED</a>
+<a class="" href="18-lab-18-node-red-and-mqtt.html">LAB 18 - Node-RED and MQTT</a>
+<a class="" href="19-lab-19-node-red-http-dashboard.html">LAB 19 - Node-RED HTTP Dashboard</a>
+<a class="" href="20-lab-20-integrated-iot-linux-stack.html">LAB 20 - Integrated IoT Linux Stack</a>
+    </nav>
+    <main class="content">
+      <h1 id="lab-16-python-mqtt-subscriber-to-sqlite">LAB 16 - Python MQTT Subscriber to SQLite</h1>
+<nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="15-lab-15-python-mqtt-publisher.html">ก่อนหน้า: LAB 15 - Python MQTT Publisher</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="17-lab-17-node-red.html">ถัดไป: LAB 17 - Node-RED</a></nav>
+<h2 id="วัตถุประสงค์">วัตถุประสงค์</h2>
+<p>สร้าง Data Collector รับ MQTT JSON และบันทึก SQLite</p>
+<h2 id="เตรียม">เตรียม</h2>
+<pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
+<pre class="language-bash"><code>su - piuser
+cd ~/python-lab
+source venv/bin/activate
+pip install paho-mqtt</code></pre>
+<h2 id="collector">Collector</h2>
+<pre class="language-bash"><code>nano mqtt_to_sqlite.py</code></pre>
+<pre class="language-python"><code>import json
+from pathlib import Path
+import sqlite3
+import paho.mqtt.client as mqtt
+
+database = Path.home() / &quot;iot-data&quot; / &quot;device_status.db&quot;
+connection = sqlite3.connect(database, check_same_thread=False)
+cursor = connection.cursor()
+
+cursor.execute(
+    &quot;CREATE TABLE IF NOT EXISTS device_logs (&quot;
+    &quot;id INTEGER PRIMARY KEY AUTOINCREMENT,&quot;
+    &quot;created_at DATETIME DEFAULT CURRENT_TIMESTAMP,&quot;
+    &quot;device_id TEXT NOT NULL,&quot;
+    &quot;location TEXT NOT NULL,&quot;
+    &quot;temperature REAL NOT NULL,&quot;
+    &quot;humidity REAL NOT NULL,&quot;
+    &quot;status TEXT NOT NULL,&quot;
+    &quot;note TEXT)&quot;
+)
+connection.commit()
+
+def on_message(client, userdata, message):
+    try:
+        data = json.loads(message.payload.decode())
+        temperature = float(data[&quot;temperature&quot;])
+        cursor.execute(
+            &quot;INSERT INTO device_logs &quot;
+            &quot;(device_id,location,temperature,humidity,status,note) &quot;
+            &quot;VALUES (?,?,?,?,?,?)&quot;,
+            (
+                data[&quot;device_id&quot;],
+                data.get(&quot;location&quot;, &quot;Unknown&quot;),
+                temperature,
+                float(data[&quot;humidity&quot;]),
+                data.get(&quot;status&quot;) or (&quot;WARNING&quot; if temperature &gt; 35 else &quot;NORMAL&quot;),
+                data.get(&quot;note&quot;, &quot;mqtt collector&quot;)
+            )
+        )
+        connection.commit()
+        print(f&quot;SAVED: {data}&quot;)
+    except Exception as error:
+        print(f&quot;ERROR: {error}&quot;)
+
+client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+client.on_message = on_message
+client.connect(&quot;127.0.0.1&quot;, 1883, 60)
+client.subscribe(&quot;pkru/iot/+/data&quot;)
+print(&quot;Waiting for MQTT data...&quot;)
+client.loop_forever()</code></pre>
+<p>รัน:</p>
+<pre class="language-bash"><code>python mqtt_to_sqlite.py</code></pre>
+<p>อีก Terminal รัน Publisher จาก LAB 15</p>
+<h2 id="ตรวจ-database">ตรวจ Database</h2>
+<pre class="language-bash"><code>sqlite3 ~/iot-data/device_status.db</code></pre>
+<pre class="language-sql"><code>.headers on
+.mode column
+SELECT * FROM device_logs ORDER BY id DESC LIMIT 10;
+SELECT device_id, COUNT(*) FROM device_logs GROUP BY device_id;
+SELECT device_id, AVG(temperature) FROM device_logs GROUP BY device_id;
+.quit</code></pre>
+<p>เปิดหน้าเว็บจาก LAB 12:</p>
+<pre class="language-text"><code>http://localhost:8080/status.html</code></pre>
+<p>ถ้า Python API และ Nginx Proxy ยังทำงานอยู่ ตารางบนเว็บจะเห็นข้อมูลที่มาจาก MQTT ปนกับข้อมูลที่กรอกผ่านฟอร์ม เพราะใช้ SQLite ตาราง <code>device_logs</code> เดียวกัน</p>
+<h2 id="แบบฝึกหัด">แบบฝึกหัด</h2>
+<p>ให้ Collector รับอย่างน้อย 2 device IDs และพิสูจน์ด้วย <code>GROUP BY</code></p>
+<p><strong>LAB ถัดไป: LAB 17 - Node-RED</strong></p>
+    </main>
+  </div>
+</body>
+</html>

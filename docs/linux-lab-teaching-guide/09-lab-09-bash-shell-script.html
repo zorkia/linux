@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LAB 09 - Bash Shell Script</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../index.html">Docker Linux Lab</a>
+    <span class="subtitle">Raspberry Pi Preparation</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Site navigation">
+      <a class="" href="../index.html">Docker Linux Lab</a>
+<a class="" href="00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
+<a class="" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
+<a class="" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
+<a class="" href="03-lab-03-linux-users-groups-ownership-และ-permissions.html">LAB 03 - Linux Users, Groups, Ownership และ Permissions</a>
+<a class="" href="04-lab-04-linux-package-management.html">LAB 04 - Linux Package Management</a>
+<a class="" href="05-lab-05-linux-processes-และ-resource-monitoring.html">LAB 05 - Linux Processes และ Resource Monitoring</a>
+<a class="" href="06-lab-06-linux-networking.html">LAB 06 - Linux Networking</a>
+<a class="" href="07-lab-07-linux-pipes-redirects-และ-text-processing.html">LAB 07 - Linux Pipes, Redirects และ Text Processing</a>
+<a class="" href="08-lab-08-linux-environment-variables-และ-bash-shell.html">LAB 08 - Linux Environment Variables และ Bash Shell</a>
+<a class="active" href="09-lab-09-bash-shell-script.html">LAB 09 - Bash Shell Script</a>
+<a class="" href="10-lab-10-python-บน-linux.html">LAB 10 - Python บน Linux</a>
+<a class="" href="11-lab-11-nginx-web-server.html">LAB 11 - Nginx Web Server</a>
+<a class="" href="12-lab-12-sqlite-database.html">LAB 12 - SQLite Database</a>
+<a class="" href="13-lab-13-mosquitto-mqtt-broker.html">LAB 13 - Mosquitto MQTT Broker</a>
+<a class="" href="14-lab-14-mqtt-json-and-topic-design.html">LAB 14 - MQTT JSON and Topic Design</a>
+<a class="" href="15-lab-15-python-mqtt-publisher.html">LAB 15 - Python MQTT Publisher</a>
+<a class="" href="16-lab-16-python-mqtt-subscriber-to-sqlite.html">LAB 16 - Python MQTT Subscriber to SQLite</a>
+<a class="" href="17-lab-17-node-red.html">LAB 17 - Node-RED</a>
+<a class="" href="18-lab-18-node-red-and-mqtt.html">LAB 18 - Node-RED and MQTT</a>
+<a class="" href="19-lab-19-node-red-http-dashboard.html">LAB 19 - Node-RED HTTP Dashboard</a>
+<a class="" href="20-lab-20-integrated-iot-linux-stack.html">LAB 20 - Integrated IoT Linux Stack</a>
+    </nav>
+    <main class="content">
+      <h1 id="lab-09-bash-shell-script">LAB 09 - Bash Shell Script</h1>
+<nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="08-lab-08-linux-environment-variables-และ-bash-shell.html">ก่อนหน้า: LAB 08 - Linux Environment Variables และ Bash Shell</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="10-lab-10-python-บน-linux.html">ถัดไป: LAB 10 - Python บน Linux</a></nav>
+<h2 id="วัตถุประสงค์">วัตถุประสงค์</h2>
+<p>เขียน Shell Script เพื่อทำงาน Linux แบบอัตโนมัติ และเตรียมแนวคิดสำหรับงานดูแล Raspberry Pi/IoT Gateway</p>
+<h2 id="เริ่มต้น">เริ่มต้น</h2>
+<pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
+<pre class="language-bash"><code>su - piuser
+mkdir -p ~/scripts
+cd ~/scripts</code></pre>
+<h2 id="1-script-แรก">1. Script แรก</h2>
+<pre class="language-bash"><code>nano hello.sh</code></pre>
+<p>ใส่:</p>
+<pre class="language-bash"><code>#!/bin/bash
+
+echo &quot;Hello Raspberry Pi Linux&quot;</code></pre>
+<p>บันทึก แล้ว:</p>
+<pre class="language-bash"><code>chmod +x hello.sh
+./hello.sh</code></pre>
+<h2 id="2-variables">2. Variables</h2>
+<p>สร้าง:</p>
+<pre class="language-bash"><code>nano device.sh</code></pre>
+<pre class="language-bash"><code>#!/bin/bash
+
+device_id=&quot;ESP32-001&quot;
+location=&quot;LAB&quot;
+
+echo &quot;Device: $device_id&quot;
+echo &quot;Location: $location&quot;</code></pre>
+<p>รัน:</p>
+<pre class="language-bash"><code>chmod +x device.sh
+./device.sh</code></pre>
+<h2 id="3-command-substitution">3. Command Substitution</h2>
+<pre class="language-bash"><code>nano system-info.sh</code></pre>
+<pre class="language-bash"><code>#!/bin/bash
+
+hostname_value=$(hostname)
+date_value=$(date)
+
+echo &quot;Hostname: $hostname_value&quot;
+echo &quot;Date: $date_value&quot;</code></pre>
+<p>รัน:</p>
+<pre class="language-bash"><code>chmod +x system-info.sh
+./system-info.sh</code></pre>
+<h2 id="4-arguments">4. Arguments</h2>
+<pre class="language-bash"><code>nano argument.sh</code></pre>
+<pre class="language-bash"><code>#!/bin/bash
+
+echo &quot;Script: $0&quot;
+echo &quot;Device: $1&quot;
+echo &quot;Value: $2&quot;</code></pre>
+<p>รัน:</p>
+<pre class="language-bash"><code>chmod +x argument.sh
+./argument.sh ESP32-01 30.5</code></pre>
+<h2 id="5-if">5. if</h2>
+<pre class="language-bash"><code>nano check-temp.sh</code></pre>
+<pre class="language-bash"><code>#!/bin/bash
+
+temp=$1
+
+if [ &quot;$temp&quot; -gt 35 ]; then
+    echo &quot;WARNING&quot;
+else
+    echo &quot;NORMAL&quot;
+fi</code></pre>
+<p>รัน:</p>
+<pre class="language-bash"><code>chmod +x check-temp.sh
+./check-temp.sh 30
+./check-temp.sh 40</code></pre>
+<h2 id="6-for">6. for</h2>
+<pre class="language-bash"><code>nano devices.sh</code></pre>
+<pre class="language-bash"><code>#!/bin/bash
+
+for device in ESP32-01 ESP32-02 ESP32-03
+do
+    echo &quot;Checking $device&quot;
+done</code></pre>
+<p>รัน:</p>
+<pre class="language-bash"><code>chmod +x devices.sh
+./devices.sh</code></pre>
+<h2 id="7-while">7. while</h2>
+<pre class="language-bash"><code>nano counter.sh</code></pre>
+<pre class="language-bash"><code>#!/bin/bash
+
+count=1
+
+while [ &quot;$count&quot; -le 5 ]
+do
+    echo &quot;Reading $count&quot;
+    count=$((count + 1))
+done</code></pre>
+<h2 id="8-เขียน-log">8. เขียน Log</h2>
+<pre class="language-bash"><code>nano logger.sh</code></pre>
+<pre class="language-bash"><code>#!/bin/bash
+
+mkdir -p ~/logs
+echo &quot;$(date) Gateway check OK&quot; &gt;&gt; ~/logs/gateway.log</code></pre>
+<p>รันหลายครั้ง:</p>
+<pre class="language-bash"><code>chmod +x logger.sh
+./logger.sh
+./logger.sh
+cat ~/logs/gateway.log</code></pre>
+<h2 id="9-exit-code">9. Exit Code</h2>
+<pre class="language-bash"><code>ls /etc
+echo $?</code></pre>
+<p>ทดลองคำสั่งผิด:</p>
+<pre class="language-bash"><code>ls /directory-does-not-exist
+echo $?</code></pre>
+<p>โดยทั่วไป <code>0</code> หมายถึงสำเร็จ และค่าที่ไม่ใช่ <code>0</code> หมายถึงเกิดเงื่อนไขผิดพลาด</p>
+<h2 id="แบบฝึกหัด">แบบฝึกหัด</h2>
+<p>สร้าง <code>iot-status.sh</code> ที่:</p>
+<ol>
+<li>แสดง Date/Time</li>
+<li>แสดง Hostname</li>
+<li>แสดง User</li>
+<li>แสดง IP ของ <code>eth0</code></li>
+<li>Ping <code>8.8.8.8</code> 1 ครั้ง</li>
+<li>แสดง <code>NETWORK=OK</code> หรือ <code>NETWORK=FAILED</code></li>
+<li>บันทึกผลลง <code>~/logs/iot-status.log</code></li>
+</ol>
+<h2 id="คำถามท้าย-lab">คำถามท้าย LAB</h2>
+<ol>
+<li>Shebang คืออะไร</li>
+<li>ทำไมต้อง <code>chmod +x</code></li>
+<li><code>$1</code>, <code>$2</code> คืออะไร</li>
+<li><code>$?</code> คืออะไร</li>
+<li>Script ช่วยงาน Raspberry Pi อย่างไร</li>
+</ol>
+<p><strong>LAB ถัดไป: LAB 10 - Python บน Linux</strong></p>
+    </main>
+  </div>
+</body>
+</html>

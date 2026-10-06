@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../index.html">Docker Linux Lab</a>
+    <span class="subtitle">Raspberry Pi Preparation</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Site navigation">
+      <a class="" href="../index.html">Docker Linux Lab</a>
+<a class="" href="00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
+<a class="" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
+<a class="active" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
+<a class="" href="03-lab-03-linux-users-groups-ownership-และ-permissions.html">LAB 03 - Linux Users, Groups, Ownership และ Permissions</a>
+<a class="" href="04-lab-04-linux-package-management.html">LAB 04 - Linux Package Management</a>
+<a class="" href="05-lab-05-linux-processes-และ-resource-monitoring.html">LAB 05 - Linux Processes และ Resource Monitoring</a>
+<a class="" href="06-lab-06-linux-networking.html">LAB 06 - Linux Networking</a>
+<a class="" href="07-lab-07-linux-pipes-redirects-และ-text-processing.html">LAB 07 - Linux Pipes, Redirects และ Text Processing</a>
+<a class="" href="08-lab-08-linux-environment-variables-และ-bash-shell.html">LAB 08 - Linux Environment Variables และ Bash Shell</a>
+<a class="" href="09-lab-09-bash-shell-script.html">LAB 09 - Bash Shell Script</a>
+<a class="" href="10-lab-10-python-บน-linux.html">LAB 10 - Python บน Linux</a>
+<a class="" href="11-lab-11-nginx-web-server.html">LAB 11 - Nginx Web Server</a>
+<a class="" href="12-lab-12-sqlite-database.html">LAB 12 - SQLite Database</a>
+<a class="" href="13-lab-13-mosquitto-mqtt-broker.html">LAB 13 - Mosquitto MQTT Broker</a>
+<a class="" href="14-lab-14-mqtt-json-and-topic-design.html">LAB 14 - MQTT JSON and Topic Design</a>
+<a class="" href="15-lab-15-python-mqtt-publisher.html">LAB 15 - Python MQTT Publisher</a>
+<a class="" href="16-lab-16-python-mqtt-subscriber-to-sqlite.html">LAB 16 - Python MQTT Subscriber to SQLite</a>
+<a class="" href="17-lab-17-node-red.html">LAB 17 - Node-RED</a>
+<a class="" href="18-lab-18-node-red-and-mqtt.html">LAB 18 - Node-RED and MQTT</a>
+<a class="" href="19-lab-19-node-red-http-dashboard.html">LAB 19 - Node-RED HTTP Dashboard</a>
+<a class="" href="20-lab-20-integrated-iot-linux-stack.html">LAB 20 - Integrated IoT Linux Stack</a>
+    </nav>
+    <main class="content">
+      <h1 id="lab-02-linux-filesystem-files-directories-และ-text-editor">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</h1>
+<nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">ก่อนหน้า: LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="03-lab-03-linux-users-groups-ownership-และ-permissions.html">ถัดไป: LAB 03 - Linux Users, Groups, Ownership และ Permissions</a></nav>
+<h2 id="1-วัตถุประสงค์">1. วัตถุประสงค์</h2>
+<p>LAB นี้ฝึกการใช้งานระบบไฟล์ของ Linux ภายใน Docker Container <code>rpi-lab</code> ที่สร้างจาก LAB 01 เพื่อเตรียมพื้นฐานสำหรับการใช้งาน Raspberry Pi จริง</p>
+<p>เมื่อจบ LAB นักศึกษาจะสามารถ</p>
+<ul>
+<li>เข้าและออกจาก Linux Container เดิม</li>
+<li>เข้าใจโครงสร้าง Directory ของ Linux</li>
+<li>ตรวจสอบตำแหน่งปัจจุบันด้วย <code>pwd</code></li>
+<li>แสดงรายการไฟล์ด้วย <code>ls</code></li>
+<li>เปลี่ยน Directory ด้วย <code>cd</code></li>
+<li>สร้าง Directory ด้วย <code>mkdir</code></li>
+<li>สร้างไฟล์ด้วย <code>touch</code></li>
+<li>คัดลอกไฟล์และ Directory ด้วย <code>cp</code></li>
+<li>ย้ายและเปลี่ยนชื่อไฟล์ด้วย <code>mv</code></li>
+<li>ลบไฟล์และ Directory ด้วย <code>rm</code> และ <code>rmdir</code></li>
+<li>อ่านไฟล์ด้วย <code>cat</code>, <code>head</code>, <code>tail</code> และ <code>less</code></li>
+<li>แก้ไขไฟล์ด้วย <code>nano</code></li>
+<li>เข้าใจ Absolute Path และ Relative Path</li>
+</ul>
+<blockquote>
+LAB นี้เน้น Windows เป็นหลัก โดยใช้ Windows Terminal หรือ PowerShell เพื่อเข้า Docker และใช้ Bash ภายใน Debian Linux
+</blockquote>
+<hr>
+<h2 id="2-สถาปัตยกรรมของ-lab">2. สถาปัตยกรรมของ LAB</h2>
+<pre class="language-text"><code>Windows Notebook
+│
+├── Windows Terminal / PowerShell
+│
+├── Docker Desktop
+│
+└── Container: rpi-lab
+     │
+     └── Debian GNU/Linux 13
+          │
+          ├── hostname: raspberrypi
+          ├── user: piuser
+          └── /home/piuser</code></pre>
+<p>LAB นี้ใช้ Container เดิมจาก LAB 01</p>
+<p>ไม่ต้องสร้าง Container ใหม่</p>
+<hr>
+<h2 id="3-เปิด-docker-desktop">3. เปิด Docker Desktop</h2>
+<p>เปิด Docker Desktop และรอจน Docker Engine พร้อมใช้งาน</p>
+<p>เปิด Windows Terminal หรือ PowerShell</p>
+<p>ตรวจสอบ Container</p>
+<pre class="language-powershell"><code>docker ps -a</code></pre>
+<p>ควรพบ Container</p>
+<pre class="language-text"><code>rpi-lab</code></pre>
+<hr>
+<h2 id="4-เข้า-linux-container">4. เข้า Linux Container</h2>
+<pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
+<p>หากเข้าสู่ระบบเป็น <code>root</code></p>
+<pre class="language-text"><code>root@raspberrypi:/#</code></pre>
+<p>เปลี่ยนเป็น <code>piuser</code></p>
+<pre class="language-bash"><code>su - piuser</code></pre>
+<p>ควรได้</p>
+<pre class="language-text"><code>piuser@raspberrypi:~$</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>whoami</code></pre>
+<p>ผลลัพธ์</p>
+<pre class="language-text"><code>piuser</code></pre>
+<hr>
+<h2 id="5-ตรวจสอบตำแหน่งปัจจุบัน">5. ตรวจสอบตำแหน่งปัจจุบัน</h2>
+<p>ใช้คำสั่ง</p>
+<pre class="language-bash"><code>pwd</code></pre>
+<p>ผลลัพธ์ควรเป็น</p>
+<pre class="language-text"><code>/home/piuser</code></pre>
+<p><code>pwd</code> ย่อมาจาก</p>
+<pre class="language-text"><code>Print Working Directory</code></pre>
+<p>หมายถึงแสดง Directory ที่กำลังทำงานอยู่</p>
+<hr>
+<h2 id="6-home-directory">6. Home Directory</h2>
+<p>เครื่องหมาย</p>
+<pre class="language-text"><code>~</code></pre>
+<p>หมายถึง Home Directory ของ User ปัจจุบัน</p>
+<p>สำหรับ <code>piuser</code></p>
+<pre class="language-text"><code>~</code></pre>
+<p>เท่ากับ</p>
+<pre class="language-text"><code>/home/piuser</code></pre>
+<p>ทดลอง</p>
+<pre class="language-bash"><code>cd /</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>pwd</code></pre>
+<p>จากนั้นกลับ Home</p>
+<pre class="language-bash"><code>cd ~</code></pre>
+<p>ตรวจสอบอีกครั้ง</p>
+<pre class="language-bash"><code>pwd</code></pre>
+<p>ควรได้</p>
+<pre class="language-text"><code>/home/piuser</code></pre>
+<p>สามารถกลับ Home ได้ด้วย</p>
+<pre class="language-bash"><code>cd</code></pre>
+<p>เช่นกัน</p>
+<hr>
+<h2 id="7-ดูรายการไฟล์และ-directory">7. ดูรายการไฟล์และ Directory</h2>
+<p>ใช้</p>
+<pre class="language-bash"><code>ls</code></pre>
+<p>แสดงรายละเอียด</p>
+<pre class="language-bash"><code>ls -l</code></pre>
+<p>แสดงไฟล์ที่ซ่อนอยู่ด้วย</p>
+<pre class="language-bash"><code>ls -a</code></pre>
+<p>แสดงรายละเอียดรวมไฟล์ซ่อน</p>
+<pre class="language-bash"><code>ls -la</code></pre>
+<p>ไฟล์ที่ชื่อขึ้นต้นด้วย <code>.</code> ถือเป็น Hidden File ใน Linux</p>
+<p>ตัวอย่าง</p>
+<pre class="language-text"><code>.bashrc
+.profile</code></pre>
+<hr>
+<h2 id="8-สำรวจโครงสร้าง-linux">8. สำรวจโครงสร้าง Linux</h2>
+<p>ไปที่ Root Directory</p>
+<pre class="language-bash"><code>cd /</code></pre>
+<p>ดูรายการ</p>
+<pre class="language-bash"><code>ls</code></pre>
+<p>จะพบ Directory สำคัญ เช่น</p>
+<pre class="language-text"><code>bin
+boot
+dev
+etc
+home
+lib
+media
+mnt
+opt
+proc
+root
+run
+srv
+sys
+tmp
+usr
+var</code></pre>
+<p>Directory ที่ควรรู้เบื้องต้น</p>
+<table>
+<thead><tr>
+<th>Directory</th>
+<th>หน้าที่</th>
+</tr></thead><tbody>
+<tr>
+<td><code>/</code></td>
+<td>จุดเริ่มต้นของ Filesystem</td>
+</tr>
+<tr>
+<td><code>/home</code></td>
+<td>Home Directory ของ User</td>
+</tr>
+<tr>
+<td><code>/etc</code></td>
+<td>Configuration ของระบบและโปรแกรม</td>
+</tr>
+<tr>
+<td><code>/var</code></td>
+<td>ข้อมูลที่เปลี่ยนแปลง เช่น log และ web data</td>
+</tr>
+<tr>
+<td><code>/tmp</code></td>
+<td>Temporary files</td>
+</tr>
+<tr>
+<td><code>/usr</code></td>
+<td>Programs, libraries และข้อมูลที่ติดตั้งในระบบ</td>
+</tr>
+<tr>
+<td><code>/proc</code></td>
+<td>ข้อมูลเกี่ยวกับ Kernel และ Process</td>
+</tr>
+<tr>
+<td><code>/root</code></td>
+<td>Home Directory ของ root</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="9-สำรวจ-home">9. สำรวจ /home</h2>
+<pre class="language-bash"><code>cd /home</code></pre>
+<pre class="language-bash"><code>ls</code></pre>
+<p>ควรพบ</p>
+<pre class="language-text"><code>piuser</code></pre>
+<p>เข้า Directory</p>
+<pre class="language-bash"><code>cd piuser</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>pwd</code></pre>
+<p>ควรได้</p>
+<pre class="language-text"><code>/home/piuser</code></pre>
+<hr>
+<h2 id="10-absolute-path-และ-relative-path">10. Absolute Path และ Relative Path</h2>
+<h3 id="absolute-path">Absolute Path</h3>
+<p>ระบุตำแหน่งตั้งแต่ Root <code>/</code></p>
+<p>ตัวอย่าง</p>
+<pre class="language-text"><code>/home/piuser
+/etc
+/var/log</code></pre>
+<p>สามารถใช้</p>
+<pre class="language-bash"><code>cd /etc</code></pre>
+<p>ได้จากทุกตำแหน่ง</p>
+<h3 id="relative-path">Relative Path</h3>
+<p>อ้างอิงจากตำแหน่งปัจจุบัน</p>
+<p>หากอยู่ที่</p>
+<pre class="language-text"><code>/home</code></pre>
+<p>สามารถใช้</p>
+<pre class="language-bash"><code>cd piuser</code></pre>
+<p>แทน</p>
+<pre class="language-bash"><code>cd /home/piuser</code></pre>
+<hr>
+<h2 id="11-เครื่องหมาย-และ">11. เครื่องหมาย . และ ..</h2>
+<p><code>.</code> หมายถึง Directory ปัจจุบัน</p>
+<p><code>..</code> หมายถึง Directory ระดับบน</p>
+<p>กลับ Home</p>
+<pre class="language-bash"><code>cd ~</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>pwd</code></pre>
+<p>ขึ้นหนึ่งระดับ</p>
+<pre class="language-bash"><code>cd ..</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>pwd</code></pre>
+<p>ควรได้</p>
+<pre class="language-text"><code>/home</code></pre>
+<p>กลับลงมา</p>
+<pre class="language-bash"><code>cd piuser</code></pre>
+<hr>
+<h2 id="12-สร้าง-directory-สำหรับ-lab">12. สร้าง Directory สำหรับ LAB</h2>
+<p>กลับ Home</p>
+<pre class="language-bash"><code>cd ~</code></pre>
+<p>สร้าง Directory</p>
+<pre class="language-bash"><code>mkdir linux-lab</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>ls</code></pre>
+<p>ควรพบ</p>
+<pre class="language-text"><code>linux-lab</code></pre>
+<p>เข้า Directory</p>
+<pre class="language-bash"><code>cd linux-lab</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>pwd</code></pre>
+<p>ควรได้</p>
+<pre class="language-text"><code>/home/piuser/linux-lab</code></pre>
+<hr>
+<h2 id="13-สร้างหลาย-directory">13. สร้างหลาย Directory</h2>
+<p>สร้าง Directory</p>
+<pre class="language-bash"><code>mkdir documents
+mkdir data
+mkdir backup</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>ls</code></pre>
+<p>ควรพบ</p>
+<pre class="language-text"><code>backup  data  documents</code></pre>
+<p>สามารถสร้างหลาย Directory ในคำสั่งเดียวได้</p>
+<pre class="language-bash"><code>mkdir temp1 temp2 temp3</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>ls</code></pre>
+<hr>
+<h2 id="14-สร้าง-directory-ซ้อนกัน">14. สร้าง Directory ซ้อนกัน</h2>
+<p>ใช้</p>
+<pre class="language-bash"><code>mkdir -p project/data/raw</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>ls -R project</code></pre>
+<p>ควรได้โครงสร้าง</p>
+<pre class="language-text"><code>project/
+└── data/
+    └── raw/</code></pre>
+<p>Option <code>-p</code> ทำให้ <code>mkdir</code> สร้าง Parent Directory ที่ยังไม่มีให้ด้วย</p>
+<hr>
+<h2 id="15-สร้างไฟล์ด้วย-touch">15. สร้างไฟล์ด้วย touch</h2>
+<p>เข้า <code>documents</code></p>
+<pre class="language-bash"><code>cd ~/linux-lab/documents</code></pre>
+<p>สร้างไฟล์</p>
+<pre class="language-bash"><code>touch test.txt</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>ls -l</code></pre>
+<p>สร้างหลายไฟล์</p>
+<pre class="language-bash"><code>touch file1.txt file2.txt file3.txt</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>ls</code></pre>
+<hr>
+<h2 id="16-เขียนข้อความลงไฟล์">16. เขียนข้อความลงไฟล์</h2>
+<p>ใช้</p>
+<pre class="language-bash"><code>echo &quot;Hello Linux&quot; &gt; hello.txt</code></pre>
+<p>อ่านไฟล์</p>
+<pre class="language-bash"><code>cat hello.txt</code></pre>
+<p>ผลลัพธ์</p>
+<pre class="language-text"><code>Hello Linux</code></pre>
+<p>เครื่องหมาย <code>&gt;</code> จะเขียนข้อมูลลงไฟล์</p>
+<p>หากไฟล์มีข้อมูลเดิม ข้อมูลเดิมจะถูกแทนที่</p>
+<hr>
+<h2 id="17-เพิ่มข้อมูลต่อท้ายไฟล์">17. เพิ่มข้อมูลต่อท้ายไฟล์</h2>
+<pre class="language-bash"><code>echo &quot;Hello Raspberry Pi&quot; &gt;&gt; hello.txt</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>cat hello.txt</code></pre>
+<p>ควรได้</p>
+<pre class="language-text"><code>Hello Linux
+Hello Raspberry Pi</code></pre>
+<p>เครื่องหมาย <code>&gt;&gt;</code> เพิ่มข้อมูลต่อท้ายโดยไม่ลบข้อมูลเดิม</p>
+<hr>
+<h2 id="18-แก้ไขไฟล์ด้วย-nano">18. แก้ไขไฟล์ด้วย Nano</h2>
+<p>เปิดไฟล์</p>
+<pre class="language-bash"><code>nano hello.txt</code></pre>
+<p>เพิ่มข้อความ</p>
+<pre class="language-text"><code>Linux Lab
+Docker Debian
+Raspberry Pi IoT</code></pre>
+<p>บันทึกด้วย</p>
+<pre class="language-text"><code>Ctrl + O</code></pre>
+<p>กด <code>Enter</code></p>
+<p>ออกจาก Nano</p>
+<pre class="language-text"><code>Ctrl + X</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>cat hello.txt</code></pre>
+<hr>
+<h2 id="19-สร้างไฟล์ข้อมูลตัวอย่าง">19. สร้างไฟล์ข้อมูลตัวอย่าง</h2>
+<p>สร้างไฟล์</p>
+<pre class="language-bash"><code>nano sensors.txt</code></pre>
+<p>ใส่ข้อมูล</p>
+<pre class="language-text"><code>ESP32-01,temp,30.5
+ESP32-01,humi,70.2
+ESP32-01,light,1250
+ESP32-02,temp,31.1
+ESP32-02,humi,68.5
+ESP32-02,light,1420
+ESP32-03,temp,29.8
+ESP32-03,humi,72.0
+ESP32-03,light,1100</code></pre>
+<p>บันทึกและออกจาก Nano</p>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>cat sensors.txt</code></pre>
+<hr>
+<h2 id="20-อ่านต้นไฟล์ด้วย-head">20. อ่านต้นไฟล์ด้วย head</h2>
+<pre class="language-bash"><code>head sensors.txt</code></pre>
+<p>กำหนดจำนวนบรรทัด</p>
+<pre class="language-bash"><code>head -n 3 sensors.txt</code></pre>
+<p>ควรแสดง 3 บรรทัดแรก</p>
+<hr>
+<h2 id="21-อ่านท้ายไฟล์ด้วย-tail">21. อ่านท้ายไฟล์ด้วย tail</h2>
+<pre class="language-bash"><code>tail sensors.txt</code></pre>
+<p>กำหนดจำนวนบรรทัด</p>
+<pre class="language-bash"><code>tail -n 3 sensors.txt</code></pre>
+<p>ควรแสดง 3 บรรทัดสุดท้าย</p>
+<hr>
+<h2 id="22-อ่านไฟล์ด้วย-less">22. อ่านไฟล์ด้วย less</h2>
+<p>ติดตั้ง <code>less</code> หากยังไม่มี</p>
+<pre class="language-bash"><code>sudo apt install -y less</code></pre>
+<p>เปิดไฟล์</p>
+<pre class="language-bash"><code>less sensors.txt</code></pre>
+<p>ใช้ปุ่มลูกศรเพื่อเลื่อน</p>
+<p>ออกจาก <code>less</code> ด้วย</p>
+<pre class="language-text"><code>q</code></pre>
+<hr>
+<h2 id="23-คัดลอกไฟล์ด้วย-cp">23. คัดลอกไฟล์ด้วย cp</h2>
+<p>คัดลอก</p>
+<pre class="language-bash"><code>cp hello.txt hello-copy.txt</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>ls -l</code></pre>
+<p>อ่านไฟล์ใหม่</p>
+<pre class="language-bash"><code>cat hello-copy.txt</code></pre>
+<hr>
+<h2 id="24-คัดลอกไฟล์ไป-directory-อื่น">24. คัดลอกไฟล์ไป Directory อื่น</h2>
+<p>ขณะอยู่ที่</p>
+<pre class="language-text"><code>/home/piuser/linux-lab/documents</code></pre>
+<p>ใช้</p>
+<pre class="language-bash"><code>cp sensors.txt ../backup/</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>ls ../backup</code></pre>
+<p>ควรพบ</p>
+<pre class="language-text"><code>sensors.txt</code></pre>
+<hr>
+<h2 id="25-คัดลอก-directory">25. คัดลอก Directory</h2>
+<p>กลับไปที่ <code>linux-lab</code></p>
+<pre class="language-bash"><code>cd ~/linux-lab</code></pre>
+<p>คัดลอก Directory พร้อมข้อมูลภายใน</p>
+<pre class="language-bash"><code>cp -r documents documents-backup</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>ls</code></pre>
+<p>และ</p>
+<pre class="language-bash"><code>ls documents-backup</code></pre>
+<p>Option <code>-r</code> หมายถึง Recursive ใช้สำหรับคัดลอก Directory และข้อมูลภายใน</p>
+<hr>
+<h2 id="26-เปลี่ยนชื่อไฟล์ด้วย-mv">26. เปลี่ยนชื่อไฟล์ด้วย mv</h2>
+<p>เข้า Directory</p>
+<pre class="language-bash"><code>cd ~/linux-lab/documents</code></pre>
+<p>เปลี่ยนชื่อ</p>
+<pre class="language-bash"><code>mv test.txt note.txt</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>ls</code></pre>
+<p><code>mv</code> ใช้ได้ทั้งย้ายไฟล์และเปลี่ยนชื่อไฟล์</p>
+<hr>
+<h2 id="27-ย้ายไฟล์ด้วย-mv">27. ย้ายไฟล์ด้วย mv</h2>
+<p>ย้ายไฟล์</p>
+<pre class="language-bash"><code>mv note.txt ../data/</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>ls ../data</code></pre>
+<p>ควรพบ</p>
+<pre class="language-text"><code>note.txt</code></pre>
+<hr>
+<h2 id="28-ลบไฟล์">28. ลบไฟล์</h2>
+<p>สร้างไฟล์ทดลอง</p>
+<pre class="language-bash"><code>touch delete-me.txt</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>ls</code></pre>
+<p>ลบ</p>
+<pre class="language-bash"><code>rm delete-me.txt</code></pre>
+<p>ตรวจสอบอีกครั้ง</p>
+<pre class="language-bash"><code>ls</code></pre>
+<blockquote>
+Linux ไม่มี Recycle Bin สำหรับคำสั่ง <code>rm</code> แบบปกติ ควรตรวจสอบชื่อไฟล์ก่อนลบเสมอ
+</blockquote>
+<hr>
+<h2 id="29-ลบ-directory-ว่าง">29. ลบ Directory ว่าง</h2>
+<p>กลับไปที่</p>
+<pre class="language-bash"><code>cd ~/linux-lab</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>ls</code></pre>
+<p>ลบ Directory ว่าง</p>
+<pre class="language-bash"><code>rmdir temp1</code></pre>
+<p><code>rmdir</code> ลบได้เฉพาะ Directory ที่ไม่มีข้อมูล</p>
+<hr>
+<h2 id="30-ลบ-directory-ที่มีข้อมูล">30. ลบ Directory ที่มีข้อมูล</h2>
+<p>สร้างตัวอย่าง</p>
+<pre class="language-bash"><code>mkdir test-delete
+touch test-delete/file.txt</code></pre>
+<p>หากใช้</p>
+<pre class="language-bash"><code>rmdir test-delete</code></pre>
+<p>จะไม่สามารถลบได้ เพราะ Directory มีข้อมูล</p>
+<p>ลบ Directory พร้อมข้อมูลด้วย</p>
+<pre class="language-bash"><code>rm -r test-delete</code></pre>
+<blockquote>
+ใช้ <code>rm -r</code> ด้วยความระมัดระวัง เพราะเป็นการลบข้อมูลภายในทั้งหมด
+</blockquote>
+<hr>
+<h2 id="31-ดูโครงสร้าง-directory-ด้วย-tree">31. ดูโครงสร้าง Directory ด้วย tree</h2>
+<p>ติดตั้ง</p>
+<pre class="language-bash"><code>sudo apt install -y tree</code></pre>
+<p>กลับไปที่</p>
+<pre class="language-bash"><code>cd ~/linux-lab</code></pre>
+<p>ใช้</p>
+<pre class="language-bash"><code>tree</code></pre>
+<p>จะเห็นโครงสร้าง Directory และ Files เป็นลำดับชั้น</p>
+<p>ตัวอย่าง</p>
+<pre class="language-text"><code>linux-lab
+├── backup
+│   └── sensors.txt
+├── data
+│   └── note.txt
+├── documents
+│   ├── file1.txt
+│   ├── file2.txt
+│   ├── file3.txt
+│   ├── hello-copy.txt
+│   ├── hello.txt
+│   └── sensors.txt
+├── documents-backup
+└── project
+    └── data
+        └── raw</code></pre>
+<hr>
+<h2 id="32-ดูข้อมูลไฟล์แบบละเอียด">32. ดูข้อมูลไฟล์แบบละเอียด</h2>
+<pre class="language-bash"><code>ls -lh</code></pre>
+<p>Option <code>-h</code> แสดงขนาดไฟล์ในรูปแบบที่อ่านง่าย</p>
+<p>ดูไฟล์ใน Directory อื่นโดยไม่ต้อง <code>cd</code></p>
+<pre class="language-bash"><code>ls -lh ~/linux-lab/documents</code></pre>
+<hr>
+<h2 id="33-ตรวจสอบชนิดไฟล์">33. ตรวจสอบชนิดไฟล์</h2>
+<p>ติดตั้งคำสั่ง <code>file</code> หากยังไม่มี</p>
+<pre class="language-bash"><code>sudo apt install -y file</code></pre>
+<p>จากนั้น</p>
+<pre class="language-bash"><code>file ~/linux-lab/documents/hello.txt</code></pre>
+<p>และ</p>
+<pre class="language-bash"><code>file /bin/bash</code></pre>
+<p>คำสั่ง <code>file</code> ใช้ตรวจสอบประเภทของไฟล์จากเนื้อหาของไฟล์</p>
+<hr>
+<h2 id="34-ค้นหาไฟล์ด้วย-find">34. ค้นหาไฟล์ด้วย find</h2>
+<p>กลับ Home</p>
+<pre class="language-bash"><code>cd ~</code></pre>
+<p>ค้นหา <code>sensors.txt</code></p>
+<pre class="language-bash"><code>find linux-lab -name &quot;sensors.txt&quot;</code></pre>
+<p>ผลลัพธ์อาจพบมากกว่าหนึ่งไฟล์ เนื่องจากมีการ Backup ไว้</p>
+<p>ค้นหาไฟล์ <code>.txt</code></p>
+<pre class="language-bash"><code>find linux-lab -name &quot;*.txt&quot;</code></pre>
+<hr>
+<h2 id="35-ตรวจสอบพื้นที่-directory">35. ตรวจสอบพื้นที่ Directory</h2>
+<p>ดูขนาด Directory</p>
+<pre class="language-bash"><code>du -sh ~/linux-lab</code></pre>
+<p>ดูขนาดแต่ละ Directory</p>
+<pre class="language-bash"><code>du -sh ~/linux-lab/*</code></pre>
+<hr>
+<h2 id="36-ทบทวน-path">36. ทบทวน Path</h2>
+<p>ตรวจสอบตำแหน่ง</p>
+<pre class="language-bash"><code>pwd</code></pre>
+<p>กลับ Home</p>
+<pre class="language-bash"><code>cd ~</code></pre>
+<p>เข้า Directory ด้วย Absolute Path</p>
+<pre class="language-bash"><code>cd /home/piuser/linux-lab/documents</code></pre>
+<p>กลับ Home</p>
+<pre class="language-bash"><code>cd ~</code></pre>
+<p>เข้า Directory ด้วย Relative Path</p>
+<pre class="language-bash"><code>cd linux-lab/documents</code></pre>
+<p>ขึ้นหนึ่งระดับ</p>
+<pre class="language-bash"><code>cd ..</code></pre>
+<p>กลับ Directory ก่อนหน้า</p>
+<pre class="language-bash"><code>cd -</code></pre>
+<hr>
+<h2 id="37-ตรวจสอบข้อมูลที่สร้างไว้">37. ตรวจสอบข้อมูลที่สร้างไว้</h2>
+<pre class="language-bash"><code>cd ~/linux-lab</code></pre>
+<pre class="language-bash"><code>tree</code></pre>
+<p>ตรวจสอบว่าไฟล์และ Directory ที่สร้างไว้ยังอยู่ครบ</p>
+<hr>
+<h2 id="38-ทดสอบ-persistence-ของ-container">38. ทดสอบ Persistence ของ Container</h2>
+<p>ออกจาก <code>piuser</code></p>
+<pre class="language-bash"><code>exit</code></pre>
+<p>ออกจาก Container</p>
+<pre class="language-bash"><code>exit</code></pre>
+<p>กลับมาที่ Windows</p>
+<pre class="language-text"><code>PS C:\Users\student&gt;</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-powershell"><code>docker ps -a</code></pre>
+<p>เปิด Container เดิม</p>
+<pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
+<p>เปลี่ยนเป็น <code>piuser</code></p>
+<pre class="language-bash"><code>su - piuser</code></pre>
+<p>ตรวจสอบข้อมูล</p>
+<pre class="language-bash"><code>tree ~/linux-lab</code></pre>
+<p>หากไฟล์ยังอยู่ แสดงให้เห็นว่า</p>
+<pre class="language-text"><code>Stop Container
+      │
+      ▼
+ข้อมูลไม่ได้หาย
+      │
+      ▼
+Start Container เดิม
+      │
+      ▼
+ข้อมูลยังคงอยู่</code></pre>
+<hr>
+<h2 id="39-คำสั่งสำคัญใน-lab-นี้">39. คำสั่งสำคัญใน LAB นี้</h2>
+<h3 id="navigation">Navigation</h3>
+<pre class="language-bash"><code>pwd
+cd
+cd ~
+cd ..
+cd -</code></pre>
+<h3 id="list">List</h3>
+<pre class="language-bash"><code>ls
+ls -l
+ls -a
+ls -la
+ls -lh</code></pre>
+<h3 id="directory">Directory</h3>
+<pre class="language-bash"><code>mkdir
+mkdir -p
+rmdir</code></pre>
+<h3 id="file">File</h3>
+<pre class="language-bash"><code>touch
+cp
+mv
+rm
+file</code></pre>
+<h3 id="read-file">Read File</h3>
+<pre class="language-bash"><code>cat
+head
+tail
+less</code></pre>
+<h3 id="edit-file">Edit File</h3>
+<pre class="language-bash"><code>nano</code></pre>
+<h3 id="search">Search</h3>
+<pre class="language-bash"><code>find</code></pre>
+<h3 id="directory-structure">Directory Structure</h3>
+<pre class="language-bash"><code>tree</code></pre>
+<h3 id="disk-usage">Disk Usage</h3>
+<pre class="language-bash"><code>du -sh</code></pre>
+<hr>
+<h2 id="40-แบบฝึกหัดท้าย-lab">40. แบบฝึกหัดท้าย LAB</h2>
+<p>ให้นักศึกษาสร้างโครงสร้างต่อไปนี้ภายใน Home Directory</p>
+<pre class="language-text"><code>iot-project
+├── config
+├── data
+│   ├── current
+│   └── history
+├── logs
+└── scripts</code></pre>
+<p>สร้างด้วยคำสั่ง Linux เท่านั้น</p>
+<p>จากนั้นสร้างไฟล์</p>
+<pre class="language-text"><code>iot-project/config/device.conf</code></pre>
+<p>ให้มีข้อมูล</p>
+<pre class="language-text"><code>device_id=ESP32-001
+location=LAB
+mqtt_topic=pkru/iot/001</code></pre>
+<p>สร้างไฟล์</p>
+<pre class="language-text"><code>iot-project/data/current/sensor.txt</code></pre>
+<p>ให้มีข้อมูล</p>
+<pre class="language-text"><code>temp=30.5
+humi=70.2
+light=1250</code></pre>
+<p>คัดลอก <code>sensor.txt</code> ไปเก็บใน</p>
+<pre class="language-text"><code>iot-project/data/history/</code></pre>
+<p>โดยเปลี่ยนชื่อเป็น</p>
+<pre class="language-text"><code>sensor-backup.txt</code></pre>
+<p>จากนั้นแสดงโครงสร้างทั้งหมดด้วย</p>
+<pre class="language-bash"><code>tree ~/iot-project</code></pre>
+<hr>
+<h2 id="41-ผลที่ต้องการจากแบบฝึกหัด">41. ผลที่ต้องการจากแบบฝึกหัด</h2>
+<pre class="language-text"><code>iot-project
+├── config
+│   └── device.conf
+├── data
+│   ├── current
+│   │   └── sensor.txt
+│   └── history
+│       └── sensor-backup.txt
+├── logs
+└── scripts</code></pre>
+<p>ตรวจสอบไฟล์</p>
+<pre class="language-bash"><code>cat ~/iot-project/config/device.conf</code></pre>
+<pre class="language-bash"><code>cat ~/iot-project/data/current/sensor.txt</code></pre>
+<pre class="language-bash"><code>cat ~/iot-project/data/history/sensor-backup.txt</code></pre>
+<hr>
+<h2 id="42-คำถามท้าย-lab">42. คำถามท้าย LAB</h2>
+<ol>
+<li><code>/</code> และ <code>~</code> แตกต่างกันอย่างไร</li>
+<li>Absolute Path และ Relative Path แตกต่างกันอย่างไร</li>
+<li><code>.</code> และ <code>..</code> หมายถึงอะไร</li>
+<li><code>ls -la</code> แตกต่างจาก <code>ls</code> อย่างไร</li>
+<li><code>mkdir -p</code> มีประโยชน์อย่างไร</li>
+<li><code>cp</code> และ <code>mv</code> แตกต่างกันอย่างไร</li>
+<li><code>&gt;</code> และ <code>&gt;&gt;</code> แตกต่างกันอย่างไร</li>
+<li><code>rm</code> และ <code>rmdir</code> แตกต่างกันอย่างไร</li>
+<li>เพราะเหตุใดจึงต้องระมัดระวังการใช้ <code>rm -r</code></li>
+<li>เมื่อ Stop Docker Container แล้วไฟล์ที่สร้างไว้หายหรือไม่</li>
+</ol>
+<hr>
+<h2 id="43-ผลลัพธ์เมื่อจบ-lab">43. ผลลัพธ์เมื่อจบ LAB</h2>
+<p>นักศึกษาควรสามารถใช้งาน Linux Filesystem ผ่าน Command Line ได้ และเข้าใจโครงสร้างพื้นฐานที่จำเป็นต่อการใช้งาน Raspberry Pi</p>
+<p>นักศึกษาควรใช้งานคำสั่งต่อไปนี้ได้</p>
+<pre class="language-text"><code>pwd
+ls
+cd
+mkdir
+touch
+cp
+mv
+rm
+rmdir
+cat
+head
+tail
+less
+nano
+find
+tree
+du</code></pre>
+<hr>
+<p><strong>LAB ถัดไป: LAB 03 - Linux Users, Groups, Ownership และ Permissions</strong></p>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LAB 20 - Integrated IoT Linux Stack</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../index.html">Docker Linux Lab</a>
+    <span class="subtitle">Raspberry Pi Preparation</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Site navigation">
+      <a class="" href="../index.html">Docker Linux Lab</a>
+<a class="" href="00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
+<a class="" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
+<a class="" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
+<a class="" href="03-lab-03-linux-users-groups-ownership-และ-permissions.html">LAB 03 - Linux Users, Groups, Ownership และ Permissions</a>
+<a class="" href="04-lab-04-linux-package-management.html">LAB 04 - Linux Package Management</a>
+<a class="" href="05-lab-05-linux-processes-และ-resource-monitoring.html">LAB 05 - Linux Processes และ Resource Monitoring</a>
+<a class="" href="06-lab-06-linux-networking.html">LAB 06 - Linux Networking</a>
+<a class="" href="07-lab-07-linux-pipes-redirects-และ-text-processing.html">LAB 07 - Linux Pipes, Redirects และ Text Processing</a>
+<a class="" href="08-lab-08-linux-environment-variables-และ-bash-shell.html">LAB 08 - Linux Environment Variables และ Bash Shell</a>
+<a class="" href="09-lab-09-bash-shell-script.html">LAB 09 - Bash Shell Script</a>
+<a class="" href="10-lab-10-python-บน-linux.html">LAB 10 - Python บน Linux</a>
+<a class="" href="11-lab-11-nginx-web-server.html">LAB 11 - Nginx Web Server</a>
+<a class="" href="12-lab-12-sqlite-database.html">LAB 12 - SQLite Database</a>
+<a class="" href="13-lab-13-mosquitto-mqtt-broker.html">LAB 13 - Mosquitto MQTT Broker</a>
+<a class="" href="14-lab-14-mqtt-json-and-topic-design.html">LAB 14 - MQTT JSON and Topic Design</a>
+<a class="" href="15-lab-15-python-mqtt-publisher.html">LAB 15 - Python MQTT Publisher</a>
+<a class="" href="16-lab-16-python-mqtt-subscriber-to-sqlite.html">LAB 16 - Python MQTT Subscriber to SQLite</a>
+<a class="" href="17-lab-17-node-red.html">LAB 17 - Node-RED</a>
+<a class="" href="18-lab-18-node-red-and-mqtt.html">LAB 18 - Node-RED and MQTT</a>
+<a class="" href="19-lab-19-node-red-http-dashboard.html">LAB 19 - Node-RED HTTP Dashboard</a>
+<a class="active" href="20-lab-20-integrated-iot-linux-stack.html">LAB 20 - Integrated IoT Linux Stack</a>
+    </nav>
+    <main class="content">
+      <h1 id="lab-20-integrated-iot-linux-stack">LAB 20 - Integrated IoT Linux Stack</h1>
+<nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="19-lab-19-node-red-http-dashboard.html">ก่อนหน้า: LAB 19 - Node-RED HTTP Dashboard</a><a class="home" href="../index.html">กลับหน้าแรก</a></nav>
+<h2 id="วัตถุประสงค์">วัตถุประสงค์</h2>
+<p>รวม LAB ก่อนหน้าเป็น IoT Gateway จำลองบน Linux Container</p>
+<h2 id="architecture">Architecture</h2>
+<pre class="language-text"><code>Python Sensor Simulator
+        │ MQTT JSON
+        ▼
+Mosquitto :1883
+   │             │
+   ▼             ▼
+Node-RED       Python Collector
+:1880              │
+                   ▼
+SQLite device_status.db
+   ▲
+   │
+Python API :5000
+   ▲
+   │ /api/
+Nginx :80
+   ▲
+   │
+Web Form + Real-time Table
+</code></pre>
+<p>เมื่อสร้าง Container ตาม LAB 01 แล้ว การเข้าจาก Windows/macOS host จะเป็น:</p>
+<pre class="language-text"><code>Host port        Container service
+8080       ---&gt;  Nginx :80
+1880       ---&gt;  Node-RED :1880
+1883       ---&gt;  Mosquitto :1883</code></pre>
+<p>เครื่องอื่นใน LAN ต้องใช้ IP ของ Windows/macOS host ไม่ใช่ IP ภายใน Container</p>
+<h2 id="start-container">Start Container</h2>
+<pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
+<pre class="language-bash"><code>su - piuser</code></pre>
+<h2 id="start-services">Start Services</h2>
+<pre class="language-bash"><code>pgrep mosquitto || sudo mosquitto -c /etc/mosquitto/mosquitto.conf -d
+pgrep nginx || sudo nginx
+pgrep -af node-red || nohup node-red &gt; ~/node-red.log 2&gt;&amp;1 &amp;
+pgrep -af &quot;python3 app.py&quot; || nohup python3 ~/iot-web/app.py &gt; ~/iot-web/api.log 2&gt;&amp;1 &amp;</code></pre>
+<p>ตรวจ:</p>
+<pre class="language-bash"><code>ss -tuln</code></pre>
+<p>ควรพบ:</p>
+<pre class="language-text"><code>80    Nginx
+5000  Python API
+1880  Node-RED
+1883  Mosquitto</code></pre>
+<p>ตรวจ Port Mapping จาก Windows/macOS host:</p>
+<pre class="language-powershell"><code>docker port rpi-lab</code></pre>
+<p>ควรพบ:</p>
+<pre class="language-text"><code>80/tcp -&gt; 0.0.0.0:8080
+1880/tcp -&gt; 0.0.0.0:1880
+1883/tcp -&gt; 0.0.0.0:1883</code></pre>
+<h2 id="start-collector">Start Collector</h2>
+<pre class="language-bash"><code>cd ~/python-lab
+source venv/bin/activate
+python mqtt_to_sqlite.py</code></pre>
+<h2 id="start-sensor-simulator">Start Sensor Simulator</h2>
+<p>เปิด Terminal Windows อีกหน้าต่าง:</p>
+<pre class="language-powershell"><code>docker exec -it rpi-lab bash</code></pre>
+<pre class="language-bash"><code>su - piuser
+cd ~/python-lab
+source venv/bin/activate
+python mqtt_publisher.py</code></pre>
+<h2 id="ตรวจ-mqtt">ตรวจ MQTT</h2>
+<p>อีก Terminal:</p>
+<pre class="language-bash"><code>mosquitto_sub -h 127.0.0.1 -t &quot;pkru/iot/+/data&quot; -v</code></pre>
+<h2 id="ตรวจ-sqlite">ตรวจ SQLite</h2>
+<pre class="language-bash"><code>sqlite3 ~/iot-data/device_status.db &quot;SELECT * FROM device_logs ORDER BY id DESC LIMIT 10;&quot;</code></pre>
+<h2 id="ตรวจ-web-services">ตรวจ Web Services</h2>
+<p>จากภายใน Container:</p>
+<pre class="language-bash"><code>curl http://127.0.0.1
+curl http://127.0.0.1/api/logs
+curl -I http://127.0.0.1:1880</code></pre>
+<p>จาก Browser บน Windows/macOS:</p>
+<pre class="language-text"><code>http://localhost:8080
+http://localhost:8080/status.html
+http://localhost:1880</code></pre>
+<p>จากเครื่องอื่นใน LAN:</p>
+<pre class="language-text"><code>http://IP-WINDOWS:8080
+http://IP-WINDOWS:1880</code></pre>
+<p>สำหรับ MQTT client ที่อยู่นอก Container:</p>
+<pre class="language-text"><code>Broker: IP-WINDOWS
+Port: 1883</code></pre>
+<h2 id="ตรวจ-process">ตรวจ Process</h2>
+<pre class="language-bash"><code>ps aux | grep nginx
+ps aux | grep mosquitto
+ps aux | grep node-red
+ps aux | grep &#x27;python3 app.py&#x27;
+ps aux | grep mqtt_to_sqlite
+ps aux | grep mqtt_publisher</code></pre>
+<h2 id="sql-statistics">SQL Statistics</h2>
+<pre class="language-bash"><code>sqlite3 ~/iot-data/device_status.db</code></pre>
+<pre class="language-sql"><code>.headers on
+.mode column
+SELECT COUNT(*) AS records FROM device_logs;
+SELECT AVG(temperature) AS avg_temp FROM device_logs;
+SELECT MIN(temperature), MAX(temperature) FROM device_logs;
+SELECT status, COUNT(*) FROM device_logs GROUP BY status;
+SELECT device_id, COUNT(*) FROM device_logs GROUP BY device_id;
+.quit</code></pre>
+<h2 id="mini-project">Mini Project</h2>
+<p>กำหนด:</p>
+<pre class="language-text"><code>device_id = รหัสนักศึกษา
+topic = pkru/iot/{student_id}/data</code></pre>
+<p>ระบบต้อง:</p>
+<ol>
+<li>สุ่ม <code>temperature</code> และ <code>humidity</code> ทุก 3 วินาที</li>
+<li>Publish MQTT JSON</li>
+<li>Node-RED รับได้</li>
+<li>Python Collector รับได้</li>
+<li>SQLite บันทึกลง <code>device_logs</code> ได้</li>
+<li>หน้าเว็บ <code>http://localhost:8080/status.html</code> แสดงข้อมูลจาก SQLite ได้</li>
+<li>กรอกข้อมูลผ่าน web form ได้</li>
+<li>Query สถิติได้</li>
+<li>Nginx ทำงานและ proxy <code>/api/</code> ไป Python API ได้</li>
+<li>Node-RED เปิดจาก <code>http://localhost:1880</code> ได้</li>
+<li>อธิบาย Process, Port และ Docker Port Mapping ได้</li>
+</ol>
+<h2 id="ขอบเขต-docker">ขอบเขต Docker</h2>
+<p>จำลองได้ดี:</p>
+<pre class="language-text"><code>Linux CLI, Filesystem, Permissions, APT, Process, TCP/IP,
+Nginx, MQTT, SQLite, Node-RED, Python, IoT Data Flow</code></pre>
+<p>ต้องใช้ Raspberry Pi จริงเมื่อเรียน:</p>
+<pre class="language-text"><code>systemd boot behavior
+NetworkManager/nmcli กับ Wi-Fi จริง
+Bluetooth/BLE
+GPIO
+I2C
+SPI
+USB hardware</code></pre>
+<h2 id="ผลลัพธ์">ผลลัพธ์</h2>
+<p>นักศึกษาควรมอง Raspberry Pi เป็น Linux IoT/Edge Gateway ที่ประกอบด้วย OS, Networking, Processes, Web Server, Message Broker, Database, Flow Processing และ Application Code</p>
+<p>ใน Docker เส้นทาง Network คือ:</p>
+<pre class="language-text"><code>Windows/macOS หรือ LAN
+        │
+        ▼
+Host Port 8080 / 1880 / 1883
+        │
+        ▼
+Docker Port Mapping
+        │
+        ▼
+Container rpi-lab</code></pre>
+<p>บน Raspberry Pi จริง เส้นทาง Network จะเข้า IP ของ Raspberry Pi โดยตรง ไม่ต้องผ่าน Docker Port Mapping</p>
+<p><strong>จบ LAB 01–20: Docker Linux Preparation for Raspberry Pi IoT</strong></p>
+    </main>
+  </div>
+</body>
+</html>

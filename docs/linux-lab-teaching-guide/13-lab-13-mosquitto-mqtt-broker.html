@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LAB 13 - Mosquitto MQTT Broker</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../index.html">Docker Linux Lab</a>
+    <span class="subtitle">Raspberry Pi Preparation</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Site navigation">
+      <a class="" href="../index.html">Docker Linux Lab</a>
+<a class="" href="00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
+<a class="" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
+<a class="" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
+<a class="" href="03-lab-03-linux-users-groups-ownership-และ-permissions.html">LAB 03 - Linux Users, Groups, Ownership และ Permissions</a>
+<a class="" href="04-lab-04-linux-package-management.html">LAB 04 - Linux Package Management</a>
+<a class="" href="05-lab-05-linux-processes-และ-resource-monitoring.html">LAB 05 - Linux Processes และ Resource Monitoring</a>
+<a class="" href="06-lab-06-linux-networking.html">LAB 06 - Linux Networking</a>
+<a class="" href="07-lab-07-linux-pipes-redirects-และ-text-processing.html">LAB 07 - Linux Pipes, Redirects และ Text Processing</a>
+<a class="" href="08-lab-08-linux-environment-variables-และ-bash-shell.html">LAB 08 - Linux Environment Variables และ Bash Shell</a>
+<a class="" href="09-lab-09-bash-shell-script.html">LAB 09 - Bash Shell Script</a>
+<a class="" href="10-lab-10-python-บน-linux.html">LAB 10 - Python บน Linux</a>
+<a class="" href="11-lab-11-nginx-web-server.html">LAB 11 - Nginx Web Server</a>
+<a class="" href="12-lab-12-sqlite-database.html">LAB 12 - SQLite Database</a>
+<a class="active" href="13-lab-13-mosquitto-mqtt-broker.html">LAB 13 - Mosquitto MQTT Broker</a>
+<a class="" href="14-lab-14-mqtt-json-and-topic-design.html">LAB 14 - MQTT JSON and Topic Design</a>
+<a class="" href="15-lab-15-python-mqtt-publisher.html">LAB 15 - Python MQTT Publisher</a>
+<a class="" href="16-lab-16-python-mqtt-subscriber-to-sqlite.html">LAB 16 - Python MQTT Subscriber to SQLite</a>
+<a class="" href="17-lab-17-node-red.html">LAB 17 - Node-RED</a>
+<a class="" href="18-lab-18-node-red-and-mqtt.html">LAB 18 - Node-RED and MQTT</a>
+<a class="" href="19-lab-19-node-red-http-dashboard.html">LAB 19 - Node-RED HTTP Dashboard</a>
+<a class="" href="20-lab-20-integrated-iot-linux-stack.html">LAB 20 - Integrated IoT Linux Stack</a>
+    </nav>
+    <main class="content">
+      <h1 id="lab-13-mosquitto-mqtt-broker">LAB 13 - Mosquitto MQTT Broker</h1>
+<nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="12-lab-12-sqlite-database.html">ก่อนหน้า: LAB 12 - SQLite Database</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="14-lab-14-mqtt-json-and-topic-design.html">ถัดไป: LAB 14 - MQTT JSON and Topic Design</a></nav>
+<h2 id="วัตถุประสงค์">วัตถุประสงค์</h2>
+<p>ติดตั้ง MQTT Broker และ Client Tools เพื่อจำลอง Raspberry Pi MQTT Server</p>
+<blockquote>
+LAB นี้ทดสอบ MQTT ภายใน Container ด้วย <code>127.0.0.1:1883</code> ก่อน ถ้าต้องการให้ Windows หรือเครื่องอื่นใน LAN เชื่อมต่อ Broker ผ่าน <code>localhost:1883</code> หรือ <code>IP-WINDOWS:1883</code> ต้องมีทั้ง Docker Port Mapping <code>-p 1883:1883</code> และ Mosquitto listener ที่รับจาก network interface
+</blockquote>
+<h2 id="ติดตั้ง">ติดตั้ง</h2>
+<pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
+<pre class="language-bash"><code>su - piuser
+sudo apt update
+sudo apt install -y mosquitto mosquitto-clients</code></pre>
+<h2 id="เปิด-listener-สำหรับ-lab">เปิด Listener สำหรับ LAB</h2>
+<p>สร้างไฟล์ config สำหรับ LAB:</p>
+<pre class="language-bash"><code>sudo nano /etc/mosquitto/conf.d/lab-listener.conf</code></pre>
+<p>ใส่:</p>
+<pre class="language-text"><code>listener 1883 0.0.0.0
+allow_anonymous true</code></pre>
+<blockquote>
+การตั้งค่านี้เหมาะสำหรับ LAB ในเครือข่ายปิดเท่านั้น ยังไม่ใช่ configuration สำหรับ production
+</blockquote>
+<h2 id="start-broker">Start Broker</h2>
+<pre class="language-bash"><code>sudo mosquitto -c /etc/mosquitto/mosquitto.conf -d
+ps aux | grep mosquitto
+ss -tuln | grep 1883</code></pre>
+<h2 id="subscriber">Subscriber</h2>
+<p>เปิด Windows Terminal อีกหน้าต่าง:</p>
+<pre class="language-powershell"><code>docker exec -it rpi-lab bash</code></pre>
+<p>แล้ว:</p>
+<pre class="language-bash"><code>su - piuser
+mosquitto_sub -h 127.0.0.1 -t &quot;lab/test&quot;</code></pre>
+<h2 id="publisher">Publisher</h2>
+<p>Terminal แรก:</p>
+<pre class="language-bash"><code>mosquitto_pub -h 127.0.0.1 -t &quot;lab/test&quot; -m &quot;Hello MQTT&quot;</code></pre>
+<h2 id="iot-topics">IoT Topics</h2>
+<p>Subscriber:</p>
+<pre class="language-bash"><code>mosquitto_sub -h 127.0.0.1 -t &quot;pkru/iot/#&quot; -v</code></pre>
+<p>Publish:</p>
+<pre class="language-bash"><code>mosquitto_pub -h 127.0.0.1 -t &quot;pkru/iot/001/temp&quot; -m &quot;30.5&quot;
+mosquitto_pub -h 127.0.0.1 -t &quot;pkru/iot/001/humi&quot; -m &quot;70.2&quot;
+mosquitto_pub -h 127.0.0.1 -t &quot;pkru/iot/001/light&quot; -m &quot;1250&quot;</code></pre>
+<h2 id="mqtt-กับระบบ-device-status-log">MQTT กับระบบ Device Status Log</h2>
+<p>จาก LAB 12 เรามีเว็บฟอร์มที่บันทึกข้อมูลลง SQLite ด้วยมือ แต่ในงาน IoT จริง ข้อมูลส่วนใหญ่ควรมาจากอุปกรณ์ผ่าน MQTT</p>
+<p>Payload ที่จะใช้ต่อใน LAB 15-16:</p>
+<pre class="language-json"><code>{
+  &quot;device_id&quot;: &quot;ESP32-001&quot;,
+  &quot;location&quot;: &quot;Lab Room&quot;,
+  &quot;temperature&quot;: 30.5,
+  &quot;humidity&quot;: 70.2,
+  &quot;status&quot;: &quot;NORMAL&quot;,
+  &quot;note&quot;: &quot;mqtt sensor&quot;
+}</code></pre>
+<p>ทดสอบ publish ข้อมูลรูปแบบเดียวกับเว็บ:</p>
+<pre class="language-bash"><code>mosquitto_pub -h 127.0.0.1 \
+  -t &quot;pkru/iot/001/data&quot; \
+  -m &#x27;{&quot;device_id&quot;:&quot;ESP32-001&quot;,&quot;location&quot;:&quot;Lab Room&quot;,&quot;temperature&quot;:30.5,&quot;humidity&quot;:70.2,&quot;status&quot;:&quot;NORMAL&quot;,&quot;note&quot;:&quot;mqtt sensor&quot;}&#x27;</code></pre>
+<p>แนวคิดสำคัญคือ เว็บฟอร์มและ MQTT เป็นคนละทางเข้า แต่สุดท้ายสามารถบันทึกลง SQLite ตารางเดียวกันได้</p>
+<h2 id="ทดสอบจาก-windows-หรือ-lan">ทดสอบจาก Windows หรือ LAN</h2>
+<p>ถ้า Container ถูกสร้างด้วย <code>-p 1883:1883</code> แล้ว Windows สามารถใช้ MQTT client เชื่อมต่อได้ที่:</p>
+<pre class="language-text"><code>Broker: localhost
+Port: 1883</code></pre>
+<p>เครื่องอื่นใน LAN ใช้:</p>
+<pre class="language-text"><code>Broker: IP-WINDOWS
+Port: 1883</code></pre>
+<p>ถ้าเชื่อมต่อจากเครื่องอื่นไม่ได้ ให้ตรวจสอบ Windows Firewall ว่าอนุญาต port <code>1883</code> แล้วหรือยัง</p>
+<p>Wildcard:</p>
+<pre class="language-text"><code>+ = หนึ่งระดับ
+# = หลายระดับ</code></pre>
+<h2 id="แบบฝึกหัด">แบบฝึกหัด</h2>
+<p>ใช้ Topic <code>pkru/iot/{student_id}/data</code> แล้ว publish JSON ที่มี <code>device_id</code>, <code>location</code>, <code>temperature</code>, <code>humidity</code>, <code>status</code>, <code>note</code> จากนั้นใช้ Subscriber <code>pkru/iot/+/data</code> รับข้อมูลจากหลายอุปกรณ์</p>
+<p><strong>LAB ถัดไป: LAB 14 - MQTT JSON และ Topic Design</strong></p>
+    </main>
+  </div>
+</body>
+</html>

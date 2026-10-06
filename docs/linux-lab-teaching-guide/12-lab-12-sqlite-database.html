@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LAB 12 - SQLite Database</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../index.html">Docker Linux Lab</a>
+    <span class="subtitle">Raspberry Pi Preparation</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Site navigation">
+      <a class="" href="../index.html">Docker Linux Lab</a>
+<a class="" href="00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
+<a class="" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
+<a class="" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
+<a class="" href="03-lab-03-linux-users-groups-ownership-และ-permissions.html">LAB 03 - Linux Users, Groups, Ownership และ Permissions</a>
+<a class="" href="04-lab-04-linux-package-management.html">LAB 04 - Linux Package Management</a>
+<a class="" href="05-lab-05-linux-processes-และ-resource-monitoring.html">LAB 05 - Linux Processes และ Resource Monitoring</a>
+<a class="" href="06-lab-06-linux-networking.html">LAB 06 - Linux Networking</a>
+<a class="" href="07-lab-07-linux-pipes-redirects-และ-text-processing.html">LAB 07 - Linux Pipes, Redirects และ Text Processing</a>
+<a class="" href="08-lab-08-linux-environment-variables-และ-bash-shell.html">LAB 08 - Linux Environment Variables และ Bash Shell</a>
+<a class="" href="09-lab-09-bash-shell-script.html">LAB 09 - Bash Shell Script</a>
+<a class="" href="10-lab-10-python-บน-linux.html">LAB 10 - Python บน Linux</a>
+<a class="" href="11-lab-11-nginx-web-server.html">LAB 11 - Nginx Web Server</a>
+<a class="active" href="12-lab-12-sqlite-database.html">LAB 12 - SQLite Database</a>
+<a class="" href="13-lab-13-mosquitto-mqtt-broker.html">LAB 13 - Mosquitto MQTT Broker</a>
+<a class="" href="14-lab-14-mqtt-json-and-topic-design.html">LAB 14 - MQTT JSON and Topic Design</a>
+<a class="" href="15-lab-15-python-mqtt-publisher.html">LAB 15 - Python MQTT Publisher</a>
+<a class="" href="16-lab-16-python-mqtt-subscriber-to-sqlite.html">LAB 16 - Python MQTT Subscriber to SQLite</a>
+<a class="" href="17-lab-17-node-red.html">LAB 17 - Node-RED</a>
+<a class="" href="18-lab-18-node-red-and-mqtt.html">LAB 18 - Node-RED and MQTT</a>
+<a class="" href="19-lab-19-node-red-http-dashboard.html">LAB 19 - Node-RED HTTP Dashboard</a>
+<a class="" href="20-lab-20-integrated-iot-linux-stack.html">LAB 20 - Integrated IoT Linux Stack</a>
+    </nav>
+    <main class="content">
+      <h1 id="lab-12-sqlite-database">LAB 12 - SQLite Database</h1>
+<nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="11-lab-11-nginx-web-server.html">ก่อนหน้า: LAB 11 - Nginx Web Server</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="13-lab-13-mosquitto-mqtt-broker.html">ถัดไป: LAB 13 - Mosquitto MQTT Broker</a></nav>
+<h2 id="วัตถุประสงค์">วัตถุประสงค์</h2>
+<p>สร้างฐานข้อมูล Sensor ด้วย SQLite เพื่อเตรียมใช้กับ IoT Gateway</p>
+<p>ใน LAB นี้จะเริ่มจากการใช้ SQLite ด้วยคำสั่งพื้นฐาน แล้วต่อยอดเป็นตัวอย่างงานจริงขนาดเล็ก: เว็บบันทึกสถานะอุปกรณ์ IoT ลง SQLite และแสดงข้อมูลล่าสุดบนเว็บแบบ real-time</p>
+<h2 id="ติดตั้ง">ติดตั้ง</h2>
+<pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
+<pre class="language-bash"><code>su - piuser
+sudo apt update
+sudo apt install -y sqlite3 python3
+sqlite3 --version
+mkdir -p ~/iot-data
+cd ~/iot-data
+sqlite3 sensor_data.db</code></pre>
+<h2 id="สร้าง-table">สร้าง Table</h2>
+<p>ที่ <code>sqlite&gt;</code>:</p>
+<pre class="language-sql"><code>CREATE TABLE sensor_data (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    device_id TEXT,
+    temp REAL,
+    humi REAL,
+    light REAL
+);
+.tables
+.schema sensor_data</code></pre>
+<h2 id="insert">INSERT</h2>
+<pre class="language-sql"><code>INSERT INTO sensor_data (device_id,temp,humi,light)
+VALUES (&#x27;ESP32-01&#x27;,30.5,70.2,1250);
+INSERT INTO sensor_data (device_id,temp,humi,light)
+VALUES (&#x27;ESP32-02&#x27;,31.1,68.5,1420);</code></pre>
+<h2 id="select">SELECT</h2>
+<pre class="language-sql"><code>.headers on
+.mode column
+SELECT * FROM sensor_data;
+SELECT * FROM sensor_data WHERE temp &gt; 30;
+SELECT COUNT(*) FROM sensor_data;
+SELECT AVG(temp) FROM sensor_data;
+SELECT MIN(temp), MAX(temp) FROM sensor_data;</code></pre>
+<h2 id="update-delete">UPDATE / DELETE</h2>
+<pre class="language-sql"><code>UPDATE sensor_data SET temp=30.8 WHERE id=1;
+DELETE FROM sensor_data WHERE id=2;
+.quit</code></pre>
+<p>ตรวจ:</p>
+<pre class="language-bash"><code>ls -lh sensor_data.db
+sqlite3 sensor_data.db &quot;SELECT * FROM sensor_data;&quot;</code></pre>
+<h2 id="mini-project-iot-device-status-log">Mini Project: IoT Device Status Log</h2>
+<p>ตัวอย่างนี้ทำระบบรับข้อมูลจากฟอร์มบนเว็บ แล้วบันทึกลง SQLite จากนั้นหน้าเว็บจะดึงข้อมูลล่าสุดมาแสดงในตารางทุก 2 วินาที</p>
+<p>ข้อมูลที่เก็บ:</p>
+<table>
+<thead><tr>
+<th>Field</th>
+<th>ความหมาย</th>
+</tr></thead><tbody>
+<tr>
+<td><code>id</code></td>
+<td>ลำดับรายการ</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>เวลาที่บันทึก</td>
+</tr>
+<tr>
+<td><code>device_id</code></td>
+<td>รหัสอุปกรณ์ เช่น <code>ESP32-001</code></td>
+</tr>
+<tr>
+<td><code>location</code></td>
+<td>ตำแหน่งอุปกรณ์ เช่น <code>Lab Room</code></td>
+</tr>
+<tr>
+<td><code>temperature</code></td>
+<td>อุณหภูมิ</td>
+</tr>
+<tr>
+<td><code>humidity</code></td>
+<td>ความชื้น</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>สถานะ เช่น <code>NORMAL</code>, <code>WARNING</code>, <code>OFFLINE</code></td>
+</tr>
+<tr>
+<td><code>note</code></td>
+<td>หมายเหตุสั้น ๆ</td>
+</tr>
+</tbody></table>
+<p>Architecture:</p>
+<pre class="language-text"><code>Browser
+  |
+  | Form / Real-time Table
+  v
+Nginx :80
+  |
+  | /api/
+  v
+Python API :5000
+  |
+  v
+SQLite: ~/iot-data/device_status.db</code></pre>
+<h3 id="1-สร้าง-python-api">1. สร้าง Python API</h3>
+<pre class="language-bash"><code>mkdir -p ~/iot-web
+nano ~/iot-web/app.py</code></pre>
+<p>ใส่:</p>
+<pre class="language-python"><code>from http.server import BaseHTTPRequestHandler, HTTPServer
+from pathlib import Path
+import json
+import sqlite3
+
+DB_PATH = Path.home() / &quot;iot-data&quot; / &quot;device_status.db&quot;
+
+
+def get_db():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    con = sqlite3.connect(DB_PATH)
+    con.row_factory = sqlite3.Row
+    return con
+
+
+def init_db():
+    with get_db() as con:
+        con.execute(&quot;&quot;&quot;
+            CREATE TABLE IF NOT EXISTS device_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                device_id TEXT NOT NULL,
+                location TEXT NOT NULL,
+                temperature REAL NOT NULL,
+                humidity REAL NOT NULL,
+                status TEXT NOT NULL,
+                note TEXT
+            )
+        &quot;&quot;&quot;)
+
+
+class Handler(BaseHTTPRequestHandler):
+    def send_json(self, data, status=200):
+        body = json.dumps(data).encode(&quot;utf-8&quot;)
+        self.send_response(status)
+        self.send_header(&quot;Content-Type&quot;, &quot;application/json&quot;)
+        self.send_header(&quot;Content-Length&quot;, str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_GET(self):
+        if self.path != &quot;/api/logs&quot;:
+            self.send_json({&quot;error&quot;: &quot;not found&quot;}, 404)
+            return
+        with get_db() as con:
+            rows = con.execute(&quot;&quot;&quot;
+                SELECT id, created_at, device_id, location,
+                       temperature, humidity, status, note
+                FROM device_logs
+                ORDER BY id DESC
+                LIMIT 20
+            &quot;&quot;&quot;).fetchall()
+        self.send_json([dict(row) for row in rows])
+
+    def do_POST(self):
+        if self.path != &quot;/api/logs&quot;:
+            self.send_json({&quot;error&quot;: &quot;not found&quot;}, 404)
+            return
+
+        length = int(self.headers.get(&quot;Content-Length&quot;, &quot;0&quot;))
+        data = json.loads(self.rfile.read(length).decode(&quot;utf-8&quot;))
+
+        with get_db() as con:
+            con.execute(&quot;&quot;&quot;
+                INSERT INTO device_logs
+                    (device_id, location, temperature, humidity, status, note)
+                VALUES (?, ?, ?, ?, ?, ?)
+            &quot;&quot;&quot;, (
+                data[&quot;device_id&quot;],
+                data[&quot;location&quot;],
+                float(data[&quot;temperature&quot;]),
+                float(data[&quot;humidity&quot;]),
+                data[&quot;status&quot;],
+                data.get(&quot;note&quot;, &quot;&quot;)
+            ))
+
+        self.send_json({&quot;ok&quot;: True}, 201)
+
+
+init_db()
+HTTPServer((&quot;127.0.0.1&quot;, 5000), Handler).serve_forever()</code></pre>
+<p>รัน API:</p>
+<pre class="language-bash"><code>cd ~/iot-web
+nohup python3 app.py &gt; ~/iot-web/api.log 2&gt;&amp;1 &amp;
+curl http://127.0.0.1:5000/api/logs</code></pre>
+<p>ทดสอบบันทึกข้อมูล:</p>
+<pre class="language-bash"><code>curl -X POST http://127.0.0.1:5000/api/logs \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;device_id&quot;:&quot;ESP32-001&quot;,&quot;location&quot;:&quot;Lab Room&quot;,&quot;temperature&quot;:30.5,&quot;humidity&quot;:70.2,&quot;status&quot;:&quot;NORMAL&quot;,&quot;note&quot;:&quot;manual test&quot;}&#x27;</code></pre>
+<p>ตรวจใน SQLite:</p>
+<pre class="language-bash"><code>sqlite3 ~/iot-data/device_status.db &quot;SELECT * FROM device_logs;&quot;</code></pre>
+<h3 id="2-สร้างหน้าเว็บ">2. สร้างหน้าเว็บ</h3>
+<pre class="language-bash"><code>sudo nano /var/www/html/status.html</code></pre>
+<p>ใส่:</p>
+<pre class="language-html"><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;title&gt;IoT Device Status Log&lt;/title&gt;
+  &lt;style&gt;
+    body { font-family: Arial, sans-serif; margin: 32px; }
+    form { display: grid; gap: 8px; max-width: 420px; margin-bottom: 24px; }
+    input, select, button { padding: 10px; font-size: 16px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f0f0f0; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;IoT Device Status Log&lt;/h1&gt;
+
+  &lt;form id=&quot;logForm&quot;&gt;
+    &lt;input name=&quot;device_id&quot; placeholder=&quot;Device ID เช่น ESP32-001&quot; required&gt;
+    &lt;input name=&quot;location&quot; placeholder=&quot;Location เช่น Lab Room&quot; required&gt;
+    &lt;input name=&quot;temperature&quot; type=&quot;number&quot; step=&quot;0.1&quot; placeholder=&quot;Temperature&quot; required&gt;
+    &lt;input name=&quot;humidity&quot; type=&quot;number&quot; step=&quot;0.1&quot; placeholder=&quot;Humidity&quot; required&gt;
+    &lt;select name=&quot;status&quot;&gt;
+      &lt;option&gt;NORMAL&lt;/option&gt;
+      &lt;option&gt;WARNING&lt;/option&gt;
+      &lt;option&gt;OFFLINE&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;input name=&quot;note&quot; placeholder=&quot;Note&quot;&gt;
+    &lt;button type=&quot;submit&quot;&gt;Save&lt;/button&gt;
+  &lt;/form&gt;
+
+  &lt;table&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Time&lt;/th&gt;
+        &lt;th&gt;Device&lt;/th&gt;
+        &lt;th&gt;Location&lt;/th&gt;
+        &lt;th&gt;Temp&lt;/th&gt;
+        &lt;th&gt;Humidity&lt;/th&gt;
+        &lt;th&gt;Status&lt;/th&gt;
+        &lt;th&gt;Note&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody id=&quot;logRows&quot;&gt;&lt;/tbody&gt;
+  &lt;/table&gt;
+
+  &lt;script&gt;
+    function cell(value) {
+      return String(value ?? &quot;&quot;).replace(/[&amp;&lt;&gt;&quot;&#x27;]/g, ch =&gt; ({
+        &quot;&amp;&quot;: &quot;&amp;amp;&quot;,
+        &quot;&lt;&quot;: &quot;&amp;lt;&quot;,
+        &quot;&gt;&quot;: &quot;&amp;gt;&quot;,
+        &#x27;&quot;&#x27;: &quot;&amp;quot;&quot;,
+        &quot;&#x27;&quot;: &quot;&amp;#39;&quot;
+      }[ch]));
+    }
+
+    async function loadLogs() {
+      const res = await fetch(&quot;/api/logs&quot;);
+      const logs = await res.json();
+      document.querySelector(&quot;#logRows&quot;).innerHTML = logs.map(row =&gt; `
+        &lt;tr&gt;
+          &lt;td&gt;${cell(row.created_at)}&lt;/td&gt;
+          &lt;td&gt;${cell(row.device_id)}&lt;/td&gt;
+          &lt;td&gt;${cell(row.location)}&lt;/td&gt;
+          &lt;td&gt;${cell(row.temperature)}&lt;/td&gt;
+          &lt;td&gt;${cell(row.humidity)}&lt;/td&gt;
+          &lt;td&gt;${cell(row.status)}&lt;/td&gt;
+          &lt;td&gt;${cell(row.note)}&lt;/td&gt;
+        &lt;/tr&gt;
+      `).join(&quot;&quot;);
+    }
+
+    document.querySelector(&quot;#logForm&quot;).addEventListener(&quot;submit&quot;, async event =&gt; {
+      event.preventDefault();
+      const data = Object.fromEntries(new FormData(event.target).entries());
+      await fetch(&quot;/api/logs&quot;, {
+        method: &quot;POST&quot;,
+        headers: {&quot;Content-Type&quot;: &quot;application/json&quot;},
+        body: JSON.stringify(data)
+      });
+      event.target.reset();
+      loadLogs();
+    });
+
+    loadLogs();
+    setInterval(loadLogs, 2000);
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<h3 id="3-ตั้งค่า-nginx-proxy">3. ตั้งค่า Nginx Proxy</h3>
+<p>ขั้นตอนนี้ทำให้หน้าเว็บและ API ใช้ address เดียวกันผ่าน Nginx:</p>
+<pre class="language-text"><code>http://localhost:8080/status.html
+http://localhost:8080/api/logs</code></pre>
+<p>ผู้ใช้ไม่ต้องเรียก Python API ที่ port <code>5000</code> โดยตรง เพราะ Nginx จะรับ <code>/api/</code> แล้วส่งต่อไปที่ <code>127.0.0.1:5000</code> ภายใน Container ให้เอง</p>
+<p>แก้ default site:</p>
+<pre class="language-bash"><code>sudo nano /etc/nginx/sites-enabled/default</code></pre>
+<p>ใช้ configuration นี้:</p>
+<pre class="language-nginx"><code>server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+    index status.html index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:5000/api/;
+        proxy_set_header Host $host;
+    }
+}</code></pre>
+<p>ตรวจและ reload:</p>
+<pre class="language-bash"><code>sudo nginx -t
+sudo nginx -s reload
+curl http://127.0.0.1/api/logs</code></pre>
+<p>เปิดจาก Browser บน Windows/macOS:</p>
+<pre class="language-text"><code>http://localhost:8080/status.html</code></pre>
+<p>เมื่อลองกรอกฟอร์ม ข้อมูลควรถูกบันทึกลง SQLite และตารางจะอัปเดตเองทุก 2 วินาที</p>
+<h2 id="แบบฝึกหัด">แบบฝึกหัด</h2>
+<p>เพิ่มอย่างน้อย 10 records จาก ESP32-01 และ ESP32-02 แล้วหา COUNT, AVG(temp), MAX(temp), MIN(humi) และจำนวนข้อมูลแยกตาม device</p>
+<p>สำหรับ Mini Project ให้เพิ่มข้อมูลจากอุปกรณ์อย่างน้อย 3 ตัว และตอบคำถาม:</p>
+<ol>
+<li>อุปกรณ์ใดมีอุณหภูมิเฉลี่ยสูงที่สุด</li>
+<li>มีรายการใดเป็น <code>WARNING</code> หรือ <code>OFFLINE</code> บ้าง</li>
+<li>ถ้าจะนำระบบนี้ไปใช้จริง ควรเพิ่ม field อะไรอีก</li>
+</ol>
+<p><strong>LAB ถัดไป: LAB 13 - Mosquitto MQTT Broker</strong></p>
+    </main>
+  </div>
+</body>
+</html>

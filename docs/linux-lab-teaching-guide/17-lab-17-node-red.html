@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LAB 17 - Node-RED</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../index.html">Docker Linux Lab</a>
+    <span class="subtitle">Raspberry Pi Preparation</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Site navigation">
+      <a class="" href="../index.html">Docker Linux Lab</a>
+<a class="" href="00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
+<a class="" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
+<a class="" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
+<a class="" href="03-lab-03-linux-users-groups-ownership-และ-permissions.html">LAB 03 - Linux Users, Groups, Ownership และ Permissions</a>
+<a class="" href="04-lab-04-linux-package-management.html">LAB 04 - Linux Package Management</a>
+<a class="" href="05-lab-05-linux-processes-และ-resource-monitoring.html">LAB 05 - Linux Processes และ Resource Monitoring</a>
+<a class="" href="06-lab-06-linux-networking.html">LAB 06 - Linux Networking</a>
+<a class="" href="07-lab-07-linux-pipes-redirects-และ-text-processing.html">LAB 07 - Linux Pipes, Redirects และ Text Processing</a>
+<a class="" href="08-lab-08-linux-environment-variables-และ-bash-shell.html">LAB 08 - Linux Environment Variables และ Bash Shell</a>
+<a class="" href="09-lab-09-bash-shell-script.html">LAB 09 - Bash Shell Script</a>
+<a class="" href="10-lab-10-python-บน-linux.html">LAB 10 - Python บน Linux</a>
+<a class="" href="11-lab-11-nginx-web-server.html">LAB 11 - Nginx Web Server</a>
+<a class="" href="12-lab-12-sqlite-database.html">LAB 12 - SQLite Database</a>
+<a class="" href="13-lab-13-mosquitto-mqtt-broker.html">LAB 13 - Mosquitto MQTT Broker</a>
+<a class="" href="14-lab-14-mqtt-json-and-topic-design.html">LAB 14 - MQTT JSON and Topic Design</a>
+<a class="" href="15-lab-15-python-mqtt-publisher.html">LAB 15 - Python MQTT Publisher</a>
+<a class="" href="16-lab-16-python-mqtt-subscriber-to-sqlite.html">LAB 16 - Python MQTT Subscriber to SQLite</a>
+<a class="active" href="17-lab-17-node-red.html">LAB 17 - Node-RED</a>
+<a class="" href="18-lab-18-node-red-and-mqtt.html">LAB 18 - Node-RED and MQTT</a>
+<a class="" href="19-lab-19-node-red-http-dashboard.html">LAB 19 - Node-RED HTTP Dashboard</a>
+<a class="" href="20-lab-20-integrated-iot-linux-stack.html">LAB 20 - Integrated IoT Linux Stack</a>
+    </nav>
+    <main class="content">
+      <h1 id="lab-17-node-red">LAB 17 - Node-RED</h1>
+<nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="16-lab-16-python-mqtt-subscriber-to-sqlite.html">ก่อนหน้า: LAB 16 - Python MQTT Subscriber to SQLite</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="18-lab-18-node-red-and-mqtt.html">ถัดไป: LAB 18 - Node-RED and MQTT</a></nav>
+<h2 id="วัตถุประสงค์">วัตถุประสงค์</h2>
+<p>ติดตั้ง Node-RED และเรียนรู้ Flow-based IoT Programming</p>
+<blockquote>
+LAB 01 ควรสร้าง Container <code>rpi-lab</code> พร้อม <code>-p 1880:1880</code> แล้ว เพื่อให้ Browser บน Windows/macOS เปิด Node-RED ได้ผ่าน <code>http://localhost:1880</code>
+</blockquote>
+<p>ถ้าใช้ Container เก่าที่ไม่ได้กำหนด <code>-p 1880:1880</code> จะทดสอบ Node-RED ได้จากภายใน Container ด้วย <code>curl</code> เท่านั้น และ Browser บน Windows/macOS จะยังเข้าไม่ได้</p>
+<h2 id="ติดตั้ง">ติดตั้ง</h2>
+<pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
+<pre class="language-bash"><code>su - piuser
+sudo apt update
+sudo apt install -y nodejs npm
+node --version
+npm --version
+sudo npm install -g --unsafe-perm node-red
+node-red --version</code></pre>
+<h2 id="start">Start</h2>
+<pre class="language-bash"><code>node-red</code></pre>
+<p>หยุดด้วย <code>Ctrl+C</code></p>
+<p>Run background:</p>
+<pre class="language-bash"><code>nohup node-red &gt; ~/node-red.log 2&gt;&amp;1 &amp;
+pgrep -af node-red
+ss -tuln | grep 1880
+tail ~/node-red.log
+curl -I http://127.0.0.1:1880</code></pre>
+<p>เปิด Browser บน Windows/macOS:</p>
+<pre class="language-text"><code>http://localhost:1880</code></pre>
+<p>ถ้าเครื่องอื่นอยู่ใน LAN เดียวกันและ Firewall อนุญาต:</p>
+<pre class="language-text"><code>http://IP-WINDOWS:1880</code></pre>
+<h2 id="แนวคิด-flow">แนวคิด Flow</h2>
+<pre class="language-text"><code>Input → Processing → Output
+Inject → Function → Debug</code></pre>
+<h2 id="docker-กับ-pi-จริง">Docker กับ Pi จริง</h2>
+<p>ใน Docker Browser ต้องเข้า Node-RED ผ่าน Port Mapping ของ host เช่น <code>http://localhost:1880</code></p>
+<p>บน Raspberry Pi จริง Browser จะเข้า IP ของ Raspberry Pi โดยตรง เช่น <code>http://192.168.1.20:1880</code></p>
+<h2 id="แบบฝึกหัด">แบบฝึกหัด</h2>
+<p>พิสูจน์ว่า Node-RED ทำงานด้วย <code>pgrep</code>, <code>ss</code>, <code>curl</code> และเปิดหน้า <code>http://localhost:1880</code> จาก Browser บน Windows/macOS</p>
+<p><strong>LAB ถัดไป: LAB 18 - Node-RED + MQTT</strong></p>
+    </main>
+  </div>
+</body>
+</html>

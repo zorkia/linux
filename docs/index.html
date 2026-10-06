@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Docker Linux Lab</title>
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">Docker Linux Lab</a>
+    <span class="subtitle">Raspberry Pi Preparation</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Site navigation">
+      <a class="active" href="index.html">Docker Linux Lab</a>
+<a class="" href="linux-lab-teaching-guide/00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
+<a class="" href="linux-lab-teaching-guide/01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
+<a class="" href="linux-lab-teaching-guide/02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
+<a class="" href="linux-lab-teaching-guide/03-lab-03-linux-users-groups-ownership-และ-permissions.html">LAB 03 - Linux Users, Groups, Ownership และ Permissions</a>
+<a class="" href="linux-lab-teaching-guide/04-lab-04-linux-package-management.html">LAB 04 - Linux Package Management</a>
+<a class="" href="linux-lab-teaching-guide/05-lab-05-linux-processes-และ-resource-monitoring.html">LAB 05 - Linux Processes และ Resource Monitoring</a>
+<a class="" href="linux-lab-teaching-guide/06-lab-06-linux-networking.html">LAB 06 - Linux Networking</a>
+<a class="" href="linux-lab-teaching-guide/07-lab-07-linux-pipes-redirects-และ-text-processing.html">LAB 07 - Linux Pipes, Redirects และ Text Processing</a>
+<a class="" href="linux-lab-teaching-guide/08-lab-08-linux-environment-variables-และ-bash-shell.html">LAB 08 - Linux Environment Variables และ Bash Shell</a>
+<a class="" href="linux-lab-teaching-guide/09-lab-09-bash-shell-script.html">LAB 09 - Bash Shell Script</a>
+<a class="" href="linux-lab-teaching-guide/10-lab-10-python-บน-linux.html">LAB 10 - Python บน Linux</a>
+<a class="" href="linux-lab-teaching-guide/11-lab-11-nginx-web-server.html">LAB 11 - Nginx Web Server</a>
+<a class="" href="linux-lab-teaching-guide/12-lab-12-sqlite-database.html">LAB 12 - SQLite Database</a>
+<a class="" href="linux-lab-teaching-guide/13-lab-13-mosquitto-mqtt-broker.html">LAB 13 - Mosquitto MQTT Broker</a>
+<a class="" href="linux-lab-teaching-guide/14-lab-14-mqtt-json-and-topic-design.html">LAB 14 - MQTT JSON and Topic Design</a>
+<a class="" href="linux-lab-teaching-guide/15-lab-15-python-mqtt-publisher.html">LAB 15 - Python MQTT Publisher</a>
+<a class="" href="linux-lab-teaching-guide/16-lab-16-python-mqtt-subscriber-to-sqlite.html">LAB 16 - Python MQTT Subscriber to SQLite</a>
+<a class="" href="linux-lab-teaching-guide/17-lab-17-node-red.html">LAB 17 - Node-RED</a>
+<a class="" href="linux-lab-teaching-guide/18-lab-18-node-red-and-mqtt.html">LAB 18 - Node-RED and MQTT</a>
+<a class="" href="linux-lab-teaching-guide/19-lab-19-node-red-http-dashboard.html">LAB 19 - Node-RED HTTP Dashboard</a>
+<a class="" href="linux-lab-teaching-guide/20-lab-20-integrated-iot-linux-stack.html">LAB 20 - Integrated IoT Linux Stack</a>
+    </nav>
+    <main class="content">
+      <h1 id="docker-linux-lab">Docker Linux Lab</h1>
+<p>ชุดปฏิบัติการสำหรับฝึกพื้นฐาน Linux ผ่าน Docker ก่อนนำไปใช้กับ Raspberry Pi จริง</p>
+<h2 id="เริ่มต้น">เริ่มต้น</h2>
+<ul>
+<li><a href="linux-lab-teaching-guide/00-linux-lab-teaching-guide-hub.html">เข้าสู่ Linux Lab Teaching Guide</a></li>
+<li><a href="linux-lab-teaching-guide/01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">เริ่ม LAB 01</a></li>
+</ul>
+<h2 id="ภาพรวมเนื้อหา">ภาพรวมเนื้อหา</h2>
+<pre class="language-text"><code>Foundation          LAB 01-04
+Linux Operation     LAB 05-09
+Programming         LAB 10-14
+IoT Stack           LAB 15-20</code></pre>
+<aside class="callout callout-info">
+<div class="callout-title">วิธีใช้งานชุด LAB</div>
+<p>เครื่อง Windows หรือ macOS ใช้เป็น host สำหรับเปิด Docker เท่านั้น ส่วนคำสั่ง Linux ในแต่ละ LAB ให้รันภายใน Container <code>rpi-lab</code></p>
+</aside>
+<aside class="callout callout-warning">
+<div class="callout-title">เรื่อง Network ของ Docker</div>
+<p>Docker Container มี IP ของตัวเอง ซึ่งไม่ใช่ IP ของ Windows/macOS host และไม่ใช่ IP ของ Raspberry Pi จริง การเข้า Web, Node-RED หรือ MQTT จากนอก Container ต้องอาศัย Docker Port Mapping ที่กำหนดตั้งแต่ตอนสร้าง Container ใน LAB 01</p>
+</aside>
+    </main>
+  </div>
+</body>
+</html>

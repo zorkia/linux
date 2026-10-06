@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../index.html">Docker Linux Lab</a>
+    <span class="subtitle">Raspberry Pi Preparation</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Site navigation">
+      <a class="" href="../index.html">Docker Linux Lab</a>
+<a class="" href="00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
+<a class="active" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
+<a class="" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
+<a class="" href="03-lab-03-linux-users-groups-ownership-และ-permissions.html">LAB 03 - Linux Users, Groups, Ownership และ Permissions</a>
+<a class="" href="04-lab-04-linux-package-management.html">LAB 04 - Linux Package Management</a>
+<a class="" href="05-lab-05-linux-processes-และ-resource-monitoring.html">LAB 05 - Linux Processes และ Resource Monitoring</a>
+<a class="" href="06-lab-06-linux-networking.html">LAB 06 - Linux Networking</a>
+<a class="" href="07-lab-07-linux-pipes-redirects-และ-text-processing.html">LAB 07 - Linux Pipes, Redirects และ Text Processing</a>
+<a class="" href="08-lab-08-linux-environment-variables-และ-bash-shell.html">LAB 08 - Linux Environment Variables และ Bash Shell</a>
+<a class="" href="09-lab-09-bash-shell-script.html">LAB 09 - Bash Shell Script</a>
+<a class="" href="10-lab-10-python-บน-linux.html">LAB 10 - Python บน Linux</a>
+<a class="" href="11-lab-11-nginx-web-server.html">LAB 11 - Nginx Web Server</a>
+<a class="" href="12-lab-12-sqlite-database.html">LAB 12 - SQLite Database</a>
+<a class="" href="13-lab-13-mosquitto-mqtt-broker.html">LAB 13 - Mosquitto MQTT Broker</a>
+<a class="" href="14-lab-14-mqtt-json-and-topic-design.html">LAB 14 - MQTT JSON and Topic Design</a>
+<a class="" href="15-lab-15-python-mqtt-publisher.html">LAB 15 - Python MQTT Publisher</a>
+<a class="" href="16-lab-16-python-mqtt-subscriber-to-sqlite.html">LAB 16 - Python MQTT Subscriber to SQLite</a>
+<a class="" href="17-lab-17-node-red.html">LAB 17 - Node-RED</a>
+<a class="" href="18-lab-18-node-red-and-mqtt.html">LAB 18 - Node-RED and MQTT</a>
+<a class="" href="19-lab-19-node-red-http-dashboard.html">LAB 19 - Node-RED HTTP Dashboard</a>
+<a class="" href="20-lab-20-integrated-iot-linux-stack.html">LAB 20 - Integrated IoT Linux Stack</a>
+    </nav>
+    <main class="content">
+      <h1 id="lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</h1>
+<nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="00-linux-lab-teaching-guide-hub.html">ก่อนหน้า: Linux Lab Teaching Guide - Hub</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">ถัดไป: LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a></nav>
+<h2 id="1-วัตถุประสงค์">1. วัตถุประสงค์</h2>
+<p>LAB นี้ใช้ Docker เพื่อสร้างสภาพแวดล้อม Debian Linux สำหรับฝึกใช้งาน Linux ก่อนนำความรู้ไปใช้กับ Raspberry Pi จริง</p>
+<p>เมื่อจบ LAB นักศึกษาจะสามารถ</p>
+<ul>
+<li>เปิดและตรวจสอบ Docker Desktop</li>
+<li>ดาวน์โหลด Debian Linux Image</li>
+<li>สร้าง Linux Container</li>
+<li>กำหนด Docker Port Mapping สำหรับ LAB ที่ต้องใช้ Web, Node-RED และ MQTT</li>
+<li>เข้าใช้งาน Linux ผ่าน Terminal</li>
+<li>เข้าใจความแตกต่างเบื้องต้นระหว่าง Docker Image และ Container</li>
+<li>สร้างผู้ใช้ Linux</li>
+<li>ใช้งาน <code>sudo</code></li>
+<li>ตรวจสอบ Network ของ Linux</li>
+<li>ทดสอบการเชื่อมต่อ Internet และ DNS</li>
+<li>ออกจากและกลับเข้า Container เดิมได้</li>
+</ul>
+<blockquote>
+LAB นี้เน้น Windows เป็นหลัก โดยใช้ Windows Terminal หรือ PowerShell เป็น host terminal เพื่อเข้าไปทำงานใน Debian Linux Container
+</blockquote>
+<blockquote>
+ถ้าใช้ macOS ให้ใช้ Docker Desktop บน macOS และเปิด Terminal แทน PowerShell ได้ คำสั่ง <code>docker ...</code> ใช้บน host ส่วนคำสั่ง Linux เช่น <code>apt</code>, <code>ip addr</code>, <code>sudo</code>, <code>/home/piuser</code> ให้รันภายใน Container หลังจากเข้า <code>rpi-lab</code> แล้วเท่านั้น
+</blockquote>
+<hr>
+<h2 id="2-สถาปัตยกรรมของ-lab">2. สถาปัตยกรรมของ LAB</h2>
+<pre class="language-text"><code>Windows Notebook
+│
+├── Windows Terminal / PowerShell
+│
+├── Docker Desktop
+│
+└── Docker Container
+     │
+     └── Debian GNU/Linux 13
+          │
+          ├── hostname: raspberrypi
+          ├── user: piuser
+          ├── Nginx    : 80
+          ├── Node-RED : 1880
+          └── Mosquitto: 1883</code></pre>
+<p>Docker Container ใน LAB นี้ใช้สำหรับจำลองสภาพแวดล้อม Linux เท่านั้น ไม่ได้จำลอง Hardware ของ Raspberry Pi เช่น GPIO, I2C, SPI, Bluetooth และ Wi-Fi Interface จริง</p>
+<p>ตั้งแต่ LAB 11 เป็นต้นไปจะมีบริการที่ต้องเปิดจาก Container ออกมายัง Windows/macOS host จึงกำหนด Port Mapping ตั้งแต่ตอนสร้าง Container:</p>
+<pre class="language-text"><code>Windows/macOS Host       Docker Container
+localhost:8080     ---&gt;  80      Nginx
+localhost:1880     ---&gt;  1880    Node-RED
+localhost:1883     ---&gt;  1883    Mosquitto MQTT</code></pre>
+<p>ถ้าเครื่องอื่นอยู่ใน LAN เดียวกันและ Firewall อนุญาต สามารถเรียกผ่าน IP ของ Windows/macOS host ได้ เช่น <code>http://IP-WINDOWS:8080</code></p>
+<hr>
+<h2 id="3-software-ที่ต้องใช้">3. Software ที่ต้องใช้</h2>
+<ul>
+<li>Docker Desktop</li>
+<li>Windows Terminal หรือ PowerShell</li>
+</ul>
+<p>สำหรับ macOS:</p>
+<ul>
+<li>Docker Desktop for Mac</li>
+<li>Terminal</li>
+</ul>
+<p>ตรวจสอบว่า Docker Desktop เปิดทำงานอยู่ก่อนเริ่ม LAB</p>
+<hr>
+<h2 id="4-เปิด-terminal">4. เปิด Terminal</h2>
+<p>เปิด <strong>Windows Terminal</strong> หรือ <strong>PowerShell</strong></p>
+<p>ถ้าใช้ macOS ให้เปิด <strong>Terminal</strong></p>
+<p>Prompt จะมีลักษณะประมาณ</p>
+<pre class="language-powershell"><code>PS C:\Users\student&gt;</code></pre>
+<p>บน macOS prompt อาจมีลักษณะประมาณ</p>
+<pre class="language-bash"><code>student@MacBook ~ %</code></pre>
+<hr>
+<h2 id="5-ตรวจสอบ-docker">5. ตรวจสอบ Docker</h2>
+<pre class="language-powershell"><code>docker --version</code></pre>
+<p>จากนั้น</p>
+<pre class="language-powershell"><code>docker info</code></pre>
+<p>หาก Docker ทำงานถูกต้อง ควรมีข้อมูลทั้ง <code>Client:</code> และ <code>Server:</code></p>
+<p>หากพบข้อความว่าไม่สามารถเชื่อมต่อ Docker daemon ให้ตรวจสอบว่า Docker Desktop เปิดทำงานอยู่หรือไม่</p>
+<hr>
+<h2 id="6-ดาวน์โหลด-debian-linux">6. ดาวน์โหลด Debian Linux</h2>
+<p>ใช้ Debian GNU/Linux 13 (Trixie)</p>
+<pre class="language-powershell"><code>docker pull debian:trixie</code></pre>
+<p>ตรวจสอบ Image</p>
+<pre class="language-powershell"><code>docker images</code></pre>
+<p>ควรพบ</p>
+<pre class="language-text"><code>debian:trixie</code></pre>
+<hr>
+<h2 id="7-สร้าง-linux-container">7. สร้าง Linux Container</h2>
+<pre class="language-powershell"><code>docker run -it --name rpi-lab --hostname raspberrypi -p 8080:80 -p 1880:1880 -p 1883:1883 debian:trixie bash</code></pre>
+<p>ความหมาย:</p>
+<ul>
+<li><code>docker run</code> - สร้างและเริ่ม Container</li>
+<li><code>-it</code> - เปิด Terminal แบบ Interactive</li>
+<li><code>--name rpi-lab</code> - ตั้งชื่อ Container</li>
+<li><code>--hostname raspberrypi</code> - ตั้ง Hostname ภายใน Linux</li>
+<li><code>-p 8080:80</code> - เปิด Web Server ใน Container port 80 ออกมาที่ host port 8080</li>
+<li><code>-p 1880:1880</code> - เปิด Node-RED ออกมาที่ host port 1880</li>
+<li><code>-p 1883:1883</code> - เปิด MQTT Broker ออกมาที่ host port 1883</li>
+<li><code>debian:trixie</code> - Image ที่ใช้</li>
+<li><code>bash</code> - เปิด Bash Shell</li>
+</ul>
+<p>ถ้าพบข้อความว่า Container ชื่อ <code>rpi-lab</code> มีอยู่แล้ว ห้ามลบ Container เดิมทันที เพราะข้อมูลและโปรแกรมจาก LAB ก่อนหน้าอาจหาย ให้ตรวจสอบกับผู้สอนก่อนว่าจะใช้ Container เดิมต่อ, สำรองข้อมูล, หรือสร้าง Container ใหม่จาก Image สำรอง</p>
+<p>เมื่อสำเร็จ Prompt จะเปลี่ยนเป็น</p>
+<pre class="language-text"><code>root@raspberrypi:/#</code></pre>
+<p>แสดงว่าขณะนี้กำลังใช้งาน Debian Linux ภายใน Docker Container</p>
+<hr>
+<h2 id="8-ตรวจสอบ-linux">8. ตรวจสอบ Linux</h2>
+<pre class="language-bash"><code>cat /etc/os-release</code></pre>
+<p>ควรพบ</p>
+<pre class="language-text"><code>PRETTY_NAME=&quot;Debian GNU/Linux 13 (trixie)&quot;</code></pre>
+<p>ตรวจสอบผู้ใช้</p>
+<pre class="language-bash"><code>whoami</code></pre>
+<p>ผลลัพธ์</p>
+<pre class="language-text"><code>root</code></pre>
+<hr>
+<h2 id="9-update-package-list">9. Update Package List</h2>
+<pre class="language-bash"><code>apt update</code></pre>
+<hr>
+<h2 id="10-ติดตั้ง-sudo-และ-adduser">10. ติดตั้ง sudo และ adduser</h2>
+<pre class="language-bash"><code>apt install -y sudo</code></pre>
+<pre class="language-bash"><code>apt install -y adduser</code></pre>
+<hr>
+<h2 id="11-สร้าง-user">11. สร้าง User</h2>
+<p>สร้าง User ชื่อ <code>piuser</code></p>
+<pre class="language-bash"><code>adduser piuser</code></pre>
+<p>กำหนด Password ตามที่อาจารย์กำหนด ส่วนข้อมูลอื่นสามารถกด <code>Enter</code> เพื่อข้ามได้</p>
+<p>เพิ่ม <code>piuser</code> เข้า Group <code>sudo</code></p>
+<pre class="language-bash"><code>usermod -aG sudo piuser</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>groups piuser</code></pre>
+<hr>
+<h2 id="12-เปลี่ยนไปใช้-piuser">12. เปลี่ยนไปใช้ piuser</h2>
+<pre class="language-bash"><code>su - piuser</code></pre>
+<p>Prompt ควรเป็น</p>
+<pre class="language-text"><code>piuser@raspberrypi:~$</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>whoami</code></pre>
+<pre class="language-bash"><code>id</code></pre>
+<pre class="language-bash"><code>groups</code></pre>
+<hr>
+<h2 id="13-ทดสอบ-sudo">13. ทดสอบ sudo</h2>
+<pre class="language-bash"><code>sudo whoami</code></pre>
+<p>ผลลัพธ์ควรเป็น</p>
+<pre class="language-text"><code>root</code></pre>
+<hr>
+<h2 id="14-ติดตั้ง-nano">14. ติดตั้ง Nano</h2>
+<pre class="language-bash"><code>sudo apt install -y nano</code></pre>
+<p>ตรวจสอบ</p>
+<pre class="language-bash"><code>nano --version</code></pre>
+<hr>
+<h2 id="15-ติดตั้งเครื่องมือ-network">15. ติดตั้งเครื่องมือ Network</h2>
+<pre class="language-bash"><code>sudo apt install -y iproute2</code></pre>
+<p>ตรวจสอบ Network Interface</p>
+<pre class="language-bash"><code>ip addr</code></pre>
+<p>ควรพบอย่างน้อย <code>lo</code> และ <code>eth0</code></p>
+<p>IP ของ <code>eth0</code> เป็น IP ภายใน Docker Network ไม่ใช่ IP ของ Windows และไม่ใช่ Wi-Fi IP ของ Raspberry Pi จริง</p>
+<p>จำไว้ว่า:</p>
+<pre class="language-text"><code>Container IP != Windows/macOS Host IP != Raspberry Pi IP จริง</code></pre>
+<p>ใน LAB นี้คำสั่ง Linux ส่วนใหญ่ทำงานภายใน Container ส่วนการเปิดหน้าเว็บจาก Browser บน Windows/macOS จะใช้ Port Mapping เช่น <code>http://localhost:8080</code></p>
+<hr>
+<h2 id="16-ตรวจสอบ-routing">16. ตรวจสอบ Routing</h2>
+<pre class="language-bash"><code>ip route</code></pre>
+<p>ตัวอย่าง</p>
+<pre class="language-text"><code>default via 172.17.0.1 dev eth0
+172.17.0.0/16 dev eth0</code></pre>
+<p>โครงสร้างโดยย่อ</p>
+<pre class="language-text"><code>Debian Container
+      │
+      ▼
+Docker Network
+      │
+      ▼
+Windows
+      │
+      ▼
+Network / Internet</code></pre>
+<hr>
+<h2 id="17-ติดตั้ง-ping">17. ติดตั้ง Ping</h2>
+<pre class="language-bash"><code>sudo apt install -y iputils-ping</code></pre>
+<p>ทดสอบ Internet ด้วย IP</p>
+<pre class="language-bash"><code>ping -c 4 8.8.8.8</code></pre>
+<p>ทดสอบ DNS</p>
+<pre class="language-bash"><code>ping -c 4 google.com</code></pre>
+<p>หากสำเร็จ แสดงว่า</p>
+<pre class="language-text"><code>Network  OK
+Internet OK
+DNS      OK</code></pre>
+<hr>
+<h2 id="18-ตรวจสอบ-hostname">18. ตรวจสอบ Hostname</h2>
+<pre class="language-bash"><code>hostname</code></pre>
+<p>ควรได้</p>
+<pre class="language-text"><code>raspberrypi</code></pre>
+<p>Prompt</p>
+<pre class="language-text"><code>piuser@raspberrypi:~$</code></pre>
+<p>ประกอบด้วย User <code>piuser</code> และ Hostname <code>raspberrypi</code></p>
+<hr>
+<h2 id="19-ออกจาก-linux-container">19. ออกจาก Linux Container</h2>
+<p>หากอยู่ใน <code>piuser</code></p>
+<pre class="language-bash"><code>exit</code></pre>
+<p>จะกลับไปเป็น</p>
+<pre class="language-text"><code>root@raspberrypi:/#</code></pre>
+<p>ออกจาก Container</p>
+<pre class="language-bash"><code>exit</code></pre>
+<p>จะกลับสู่ Windows</p>
+<pre class="language-text"><code>PS C:\Users\student&gt;</code></pre>
+<hr>
+<h2 id="20-ตรวจสอบ-container-จาก-windows">20. ตรวจสอบ Container จาก Windows</h2>
+<p>ดู Container ที่กำลังทำงาน</p>
+<pre class="language-powershell"><code>docker ps</code></pre>
+<p>ดู Container ทั้งหมด</p>
+<pre class="language-powershell"><code>docker ps -a</code></pre>
+<p>ควรพบ Container ชื่อ <code>rpi-lab</code></p>
+<hr>
+<h2 id="21-กลับเข้า-linux-container-เดิม">21. กลับเข้า Linux Container เดิม</h2>
+<p>ไม่ต้องใช้ <code>docker run</code> ใหม่</p>
+<pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
+<p>จากนั้น</p>
+<pre class="language-bash"><code>su - piuser</code></pre>
+<p>ควรกลับมาที่</p>
+<pre class="language-text"><code>piuser@raspberrypi:~$</code></pre>
+<hr>
+<h2 id="22-image-และ-container">22. Image และ Container</h2>
+<pre class="language-text"><code>debian:trixie
+      │
+      │ Docker Image
+      │
+      │ docker run
+      ▼
+┌────────────────────┐
+│      rpi-lab       │
+│                    │
+│ Debian Linux       │
+│ hostname:          │
+│ raspberrypi        │
+│                    │
+│ user: piuser       │
+│                    │
+│ sudo               │
+│ nano               │
+│ iproute2           │
+│ ping               │
+└────────────────────┘
+    Docker Container</code></pre>
+<p><code>debian:trixie</code> คือ Image ต้นแบบ</p>
+<p><code>rpi-lab</code> คือ Container ที่สร้างจาก Image และเก็บการเปลี่ยนแปลงที่ทำภายใน Container</p>
+<hr>
+<h2 id="23-คำสั่ง-docker-ที่ต้องรู้">23. คำสั่ง Docker ที่ต้องรู้</h2>
+<pre class="language-powershell"><code>docker images</code></pre>
+<pre class="language-powershell"><code>docker ps</code></pre>
+<pre class="language-powershell"><code>docker ps -a</code></pre>
+<pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
+<pre class="language-powershell"><code>docker stop rpi-lab</code></pre>
+<hr>
+<h2 id="24-คำสั่ง-linux-ที่ต้องรู้">24. คำสั่ง Linux ที่ต้องรู้</h2>
+<pre class="language-bash"><code>cat /etc/os-release
+whoami
+id
+groups
+hostname
+ip addr
+ip route
+ping -c 4 8.8.8.8
+ping -c 4 google.com</code></pre>
+<hr>
+<h2 id="25-แบบฝึกหัดท้าย-lab">25. แบบฝึกหัดท้าย LAB</h2>
+<p>ให้นักศึกษาแสดงผลลัพธ์ของ</p>
+<pre class="language-bash"><code>whoami
+hostname
+cat /etc/os-release
+id
+groups
+ip addr
+ip route
+ping -c 4 google.com</code></pre>
+<p>จากนั้นออกจาก Container</p>
+<pre class="language-bash"><code>exit
+exit</code></pre>
+<p>ตรวจสอบจาก Windows</p>
+<pre class="language-powershell"><code>docker ps -a</code></pre>
+<p>ตรวจสอบ Port Mapping ของ Container</p>
+<pre class="language-powershell"><code>docker port rpi-lab</code></pre>
+<p>ควรเห็นประมาณนี้</p>
+<pre class="language-text"><code>80/tcp -&gt; 0.0.0.0:8080
+1880/tcp -&gt; 0.0.0.0:1880
+1883/tcp -&gt; 0.0.0.0:1883</code></pre>
+<p>แล้วกลับเข้า Container เดิม</p>
+<pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
+<hr>
+<h2 id="26-คำถามท้าย-lab">26. คำถามท้าย LAB</h2>
+<ol>
+<li>Docker Image คืออะไร</li>
+<li>Docker Container คืออะไร</li>
+<li>Windows Prompt กับ Linux Prompt แตกต่างกันอย่างไร</li>
+<li><code>root</code> กับ <code>piuser</code> แตกต่างกันอย่างไร</li>
+<li><code>sudo</code> ใช้ทำอะไร</li>
+<li><code>ip addr</code> ใช้ดูอะไร</li>
+<li><code>ip route</code> ใช้ดูอะไร</li>
+<li>Container เชื่อมต่อ Internet ผ่านอะไร</li>
+<li>การใช้ <code>exit</code> เป็นการลบ Container หรือไม่</li>
+<li>จะกลับเข้า Container เดิมด้วยคำสั่งใด</li>
+<li><code>-p 8080:80</code> หมายความว่าอะไร</li>
+<li>Container IP แตกต่างจาก Windows IP อย่างไร</li>
+</ol>
+<hr>
+<h2 id="ผลลัพธ์เมื่อจบ-lab">ผลลัพธ์เมื่อจบ LAB</h2>
+<p>นักศึกษาควรมี</p>
+<pre class="language-text"><code>Container : rpi-lab
+OS        : Debian GNU/Linux 13
+Hostname  : raspberrypi
+User      : piuser
+Ports     : 8080-&gt;80, 1880-&gt;1880, 1883-&gt;1883</code></pre>
+<p>และสามารถกลับเข้า Linux ได้ด้วย</p>
+<pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
+<p>จากนั้น</p>
+<pre class="language-bash"><code>su - piuser</code></pre>
+<p>จนได้ Prompt</p>
+<pre class="language-text"><code>piuser@raspberrypi:~$</code></pre>
+<hr>
+<p><strong>LAB ถัดไป: LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</strong></p>
+    </main>
+  </div>
+</body>
+</html>

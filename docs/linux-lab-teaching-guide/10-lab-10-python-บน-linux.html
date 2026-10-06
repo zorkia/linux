@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LAB 10 - Python บน Linux</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../index.html">Docker Linux Lab</a>
+    <span class="subtitle">Raspberry Pi Preparation</span>
+  </header>
+  <div class="layout">
+    <nav class="sidebar" aria-label="Site navigation">
+      <a class="" href="../index.html">Docker Linux Lab</a>
+<a class="" href="00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
+<a class="" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
+<a class="" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
+<a class="" href="03-lab-03-linux-users-groups-ownership-และ-permissions.html">LAB 03 - Linux Users, Groups, Ownership และ Permissions</a>
+<a class="" href="04-lab-04-linux-package-management.html">LAB 04 - Linux Package Management</a>
+<a class="" href="05-lab-05-linux-processes-และ-resource-monitoring.html">LAB 05 - Linux Processes และ Resource Monitoring</a>
+<a class="" href="06-lab-06-linux-networking.html">LAB 06 - Linux Networking</a>
+<a class="" href="07-lab-07-linux-pipes-redirects-และ-text-processing.html">LAB 07 - Linux Pipes, Redirects และ Text Processing</a>
+<a class="" href="08-lab-08-linux-environment-variables-และ-bash-shell.html">LAB 08 - Linux Environment Variables และ Bash Shell</a>
+<a class="" href="09-lab-09-bash-shell-script.html">LAB 09 - Bash Shell Script</a>
+<a class="active" href="10-lab-10-python-บน-linux.html">LAB 10 - Python บน Linux</a>
+<a class="" href="11-lab-11-nginx-web-server.html">LAB 11 - Nginx Web Server</a>
+<a class="" href="12-lab-12-sqlite-database.html">LAB 12 - SQLite Database</a>
+<a class="" href="13-lab-13-mosquitto-mqtt-broker.html">LAB 13 - Mosquitto MQTT Broker</a>
+<a class="" href="14-lab-14-mqtt-json-and-topic-design.html">LAB 14 - MQTT JSON and Topic Design</a>
+<a class="" href="15-lab-15-python-mqtt-publisher.html">LAB 15 - Python MQTT Publisher</a>
+<a class="" href="16-lab-16-python-mqtt-subscriber-to-sqlite.html">LAB 16 - Python MQTT Subscriber to SQLite</a>
+<a class="" href="17-lab-17-node-red.html">LAB 17 - Node-RED</a>
+<a class="" href="18-lab-18-node-red-and-mqtt.html">LAB 18 - Node-RED and MQTT</a>
+<a class="" href="19-lab-19-node-red-http-dashboard.html">LAB 19 - Node-RED HTTP Dashboard</a>
+<a class="" href="20-lab-20-integrated-iot-linux-stack.html">LAB 20 - Integrated IoT Linux Stack</a>
+    </nav>
+    <main class="content">
+      <h1 id="lab-10-python-บน-linux">LAB 10 - Python บน Linux</h1>
+<nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="09-lab-09-bash-shell-script.html">ก่อนหน้า: LAB 09 - Bash Shell Script</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="11-lab-11-nginx-web-server.html">ถัดไป: LAB 11 - Nginx Web Server</a></nav>
+<h2 id="วัตถุประสงค์">วัตถุประสงค์</h2>
+<p>ติดตั้งและใช้งาน Python บน Debian Linux แบบเดียวกับ workflow ที่ใช้บน Raspberry Pi พร้อมเรียนรู้ Virtual Environment</p>
+<h2 id="เริ่มต้น">เริ่มต้น</h2>
+<pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
+<pre class="language-bash"><code>su - piuser</code></pre>
+<h2 id="1-ติดตั้ง-python">1. ติดตั้ง Python</h2>
+<pre class="language-bash"><code>sudo apt update
+sudo apt install -y python3 python3-pip python3-venv</code></pre>
+<p>ตรวจ:</p>
+<pre class="language-bash"><code>python3 --version
+pip3 --version</code></pre>
+<h2 id="2-python-interactive">2. Python Interactive</h2>
+<pre class="language-bash"><code>python3</code></pre>
+<p>ทดลอง:</p>
+<pre class="language-python"><code>print(&quot;Hello Raspberry Pi&quot;)
+2 + 3</code></pre>
+<p>ออก:</p>
+<pre class="language-python"><code>exit()</code></pre>
+<h2 id="3-โปรแกรมแรก">3. โปรแกรมแรก</h2>
+<pre class="language-bash"><code>mkdir -p ~/python-lab
+cd ~/python-lab
+nano hello.py</code></pre>
+<p>ใส่:</p>
+<pre class="language-python"><code>print(&quot;Hello from Python on Linux&quot;)</code></pre>
+<p>รัน:</p>
+<pre class="language-bash"><code>python3 hello.py</code></pre>
+<h2 id="4-sensor-simulation">4. Sensor Simulation</h2>
+<pre class="language-bash"><code>nano sensor.py</code></pre>
+<pre class="language-python"><code>import random
+
+temp = round(random.uniform(25, 40), 1)
+humi = round(random.uniform(50, 90), 1)
+light = random.randint(100, 3000)
+
+print(f&quot;temp={temp}&quot;)
+print(f&quot;humi={humi}&quot;)
+print(f&quot;light={light}&quot;)</code></pre>
+<p>รัน:</p>
+<pre class="language-bash"><code>python3 sensor.py</code></pre>
+<h2 id="5-loop">5. Loop</h2>
+<pre class="language-bash"><code>nano sensor_loop.py</code></pre>
+<pre class="language-python"><code>import random
+import time
+
+while True:
+    temp = round(random.uniform(25, 40), 1)
+    humi = round(random.uniform(50, 90), 1)
+    light = random.randint(100, 3000)
+
+    print(f&quot;temp={temp}, humi={humi}, light={light}&quot;)
+    time.sleep(2)</code></pre>
+<p>รัน:</p>
+<pre class="language-bash"><code>python3 sensor_loop.py</code></pre>
+<p>หยุด:</p>
+<pre class="language-text"><code>Ctrl + C</code></pre>
+<h2 id="6-json">6. JSON</h2>
+<pre class="language-bash"><code>nano sensor_json.py</code></pre>
+<pre class="language-python"><code>import json
+import random
+
+data = {
+    &quot;temp&quot;: round(random.uniform(25, 40), 1),
+    &quot;humi&quot;: round(random.uniform(50, 90), 1),
+    &quot;light&quot;: random.randint(100, 3000),
+}
+
+print(json.dumps(data))</code></pre>
+<p>รัน:</p>
+<pre class="language-bash"><code>python3 sensor_json.py</code></pre>
+<h2 id="7-virtual-environment">7. Virtual Environment</h2>
+<p>สร้าง:</p>
+<pre class="language-bash"><code>cd ~/python-lab
+python3 -m venv venv</code></pre>
+<p>เปิด:</p>
+<pre class="language-bash"><code>source venv/bin/activate</code></pre>
+<p>Prompt จะมี <code>(venv)</code></p>
+<p>ตรวจ:</p>
+<pre class="language-bash"><code>which python
+which pip
+python --version</code></pre>
+<h2 id="8-ติดตั้ง-package-ใน-venv">8. ติดตั้ง Package ใน venv</h2>
+<pre class="language-bash"><code>pip install requests</code></pre>
+<p>ตรวจ:</p>
+<pre class="language-bash"><code>pip list</code></pre>
+<blockquote>
+บน Debian รุ่นใหม่ การใช้ venv เป็นแนวทางที่เหมาะสมกว่าการ <code>sudo pip install</code> ลง System Python
+</blockquote>
+<h2 id="9-http-request">9. HTTP Request</h2>
+<pre class="language-bash"><code>nano http_test.py</code></pre>
+<pre class="language-python"><code>import requests
+
+response = requests.get(&quot;https://example.com&quot;, timeout=10)
+
+print(response.status_code)
+print(response.headers.get(&quot;content-type&quot;))</code></pre>
+<p>รัน:</p>
+<pre class="language-bash"><code>python http_test.py</code></pre>
+<h2 id="10-ออกจาก-venv">10. ออกจาก venv</h2>
+<pre class="language-bash"><code>deactivate</code></pre>
+<h2 id="11-python-process">11. Python Process</h2>
+<p>รัน:</p>
+<pre class="language-bash"><code>python3 sensor_loop.py</code></pre>
+<p>เปิด Terminal Windows อีกหน้าต่าง:</p>
+<pre class="language-powershell"><code>docker exec -it rpi-lab bash</code></pre>
+<p>ค้นหา:</p>
+<pre class="language-bash"><code>ps aux | grep sensor_loop.py</code></pre>
+<p>นี่เชื่อมโยง LAB Python กับ Process Management</p>
+<h2 id="12-ข้อจำกัดของ-docker">12. ข้อจำกัดของ Docker</h2>
+<p>Python/Linux application ทำงานใกล้เคียง Raspberry Pi มาก แต่ LAB นี้ไม่ได้จำลอง GPIO, I2C, SPI, BLE หรือ Wi-Fi hardware จริง</p>
+<h2 id="แบบฝึกหัด">แบบฝึกหัด</h2>
+<p>สร้าง <code>iot_device.py</code> ที่:</p>
+<ol>
+<li>สุ่ม <code>temp</code>, <code>humi</code>, <code>light</code></li>
+<li>สร้างข้อมูลแบบ JSON</li>
+<li>เพิ่ม <code>device_id</code> เป็น <code>ESP32-001</code></li>
+<li>เพิ่มเวลาปัจจุบัน</li>
+<li>แสดงข้อมูลทุก 3 วินาที</li>
+<li>หยุดด้วย <code>Ctrl+C</code></li>
+</ol>
+<p>ตัวอย่างรูปแบบ:</p>
+<pre class="language-json"><code>{&quot;device_id&quot;:&quot;ESP32-001&quot;,&quot;temp&quot;:30.5,&quot;humi&quot;:70.2,&quot;light&quot;:1250}</code></pre>
+<h2 id="คำถามท้าย-lab">คำถามท้าย LAB</h2>
+<ol>
+<li><code>python3</code>, <code>pip</code> และ <code>venv</code> ทำหน้าที่อะไร</li>
+<li>ทำไมควรใช้ Virtual Environment</li>
+<li><code>Ctrl+C</code> ส่งผลอย่างไรต่อโปรแกรม Loop</li>
+<li>JSON เหมาะกับ IoT อย่างไร</li>
+<li>ส่วนใดของ Raspberry Pi ที่ Docker/Python Lab นี้ยังจำลองไม่ได้</li>
+</ol>
+<h2 id="ผลลัพธ์เมื่อจบ-lab-10">ผลลัพธ์เมื่อจบ LAB 10</h2>
+<p>นักศึกษามีพื้นฐาน:</p>
+<pre class="language-text"><code>Linux filesystem
+Users / permissions
+APT
+Processes
+Resource monitoring
+Networking
+Pipes / redirects
+Environment variables
+Bash scripting
+Python / venv</code></pre>
+<p>พร้อมเข้าสู่ Software Stack สำหรับ Raspberry Pi IoT เช่น:</p>
+<pre class="language-text"><code>Nginx
+Mosquitto MQTT
+SQLite
+Node-RED</code></pre>
+<p><strong>LAB ถัดไป: เริ่ม Raspberry Pi IoT Software Stack</strong></p>
+    </main>
+  </div>
+</body>
+</html>
