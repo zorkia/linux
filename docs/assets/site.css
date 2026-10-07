@@ -177,7 +177,13 @@ pre.language-diagram {
 
 .code-block pre {
   margin: 0;
-  padding-bottom: 54px;
+  overflow: hidden;
+  padding-right: 60px;
+}
+
+.code-block pre code {
+  display: block;
+  overflow-x: auto;
 }
 
 .copy-button {
@@ -232,11 +238,10 @@ pre.language-diagram {
   mask-image: url('circle-alert.svg');
 }
 
-.copy-button::after {
+.copy-tooltip {
   position: absolute;
-  right: calc(100% + 6px);
-  bottom: 50%;
-  transform: translateY(50%);
+  right: 8px;
+  bottom: calc(100% + 6px);
   width: max-content;
   max-width: min(220px, calc(100vw - 48px));
   padding: 5px 8px;
@@ -244,16 +249,15 @@ pre.language-diagram {
   border-radius: 5px;
   background: #24272e;
   color: #ffffff;
-  content: attr(aria-label);
   font: 12px/1.4 ui-sans-serif, system-ui, sans-serif;
   opacity: 0;
   pointer-events: none;
 }
 
-.copy-button:hover::after,
-.copy-button:focus-visible::after,
-.copy-button[data-state='copied']::after,
-.copy-button[data-state='error']::after {
+.copy-button:hover + .copy-tooltip,
+.copy-button:focus-visible + .copy-tooltip,
+.copy-button[data-state='copied'] + .copy-tooltip,
+.copy-button[data-state='error'] + .copy-tooltip {
   opacity: 1;
 }
 
@@ -282,10 +286,7 @@ pre.language-diagram {
   .copy-button {
     width: 44px;
     height: 44px;
-  }
-
-  .code-block pre {
-    padding-bottom: 62px;
+    bottom: 4px;
   }
 }
 

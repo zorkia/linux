@@ -63,11 +63,14 @@
     icon.className = 'copy-icon';
     icon.setAttribute('aria-hidden', 'true');
     button.append(icon);
+    const tooltip = document.createElement('span');
+    tooltip.className = 'copy-tooltip';
+    tooltip.setAttribute('aria-hidden', 'true');
 
     function setState(state, label) {
       button.dataset.state = state;
       button.setAttribute('aria-label', label);
-      button.title = label;
+      tooltip.textContent = label;
     }
 
     setState('idle', 'คัดลอกข้อความ');
@@ -95,6 +98,6 @@
       }
     });
 
-    block.append(button);
+    block.append(button, tooltip);
   });
 })();
