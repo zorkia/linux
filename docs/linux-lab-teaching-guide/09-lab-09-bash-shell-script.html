@@ -43,7 +43,7 @@
 <nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="08-lab-08-linux-environment-variables-และ-bash-shell.html">ก่อนหน้า: LAB 08 - Linux Environment Variables และ Bash Shell</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="10-lab-10-python-บน-linux.html">ถัดไป: LAB 10 - Python บน Linux</a></nav>
 <aside class="callout callout-info">
 <div class="callout-title">เครื่องมือสำหรับ LAB นี้</div>
-<p>ใช้ <code>nano</code> ที่ติดตั้งใน LAB 01 เพื่อเขียน Script ส่วน <code>bash</code>, <code>hostname</code>, <code>date</code> และ <code>chmod</code> มีอยู่ใน Image ดู <a href="../linux-lab-software-setup.html">รวมคำสั่งและการติดตั้งล่วงหน้า</a></p>
+<p>ใช้ <code>nano</code> เพื่อเขียน Script และ <code>procps</code> (<code>ps</code>) เพื่อตรวจ Background Process ส่วน <code>bash</code>, <code>hostname</code>, <code>date</code>, <code>df</code>, <code>tail</code>, <code>nohup</code> และ <code>chmod</code> มีอยู่ใน Image ดู <a href="../linux-lab-software-setup.html">รวมคำสั่งและการติดตั้งล่วงหน้า</a></p>
 </aside>
 <h2 id="วัตถุประสงค์">วัตถุประสงค์</h2>
 <p>เขียน Shell Script เพื่อทำงาน Linux แบบอัตโนมัติ และเตรียมแนวคิดสำหรับงานดูแล Raspberry Pi/IoT Gateway</p>
@@ -51,7 +51,7 @@
 <pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
 <pre class="language-bash"><code>su - piuser
 sudo apt update
-sudo apt install -y nano
+sudo apt install -y nano procps
 mkdir -p ~/scripts
 cd ~/scripts</code></pre>
 <h2 id="1-script-แรก">1. Script แรก</h2>
@@ -153,6 +153,55 @@ echo $?</code></pre>
 <pre class="language-bash"><code>ls /directory-does-not-exist
 echo $?</code></pre>
 <p>โดยทั่วไป <code>0</code> หมายถึงสำเร็จ และค่าที่ไม่ใช่ <code>0</code> หมายถึงเกิดเงื่อนไขผิดพลาด</p>
+<h2 id="10-bash-script-แบบ-background">10. Bash Script แบบ Background</h2>
+<p>ตัวอย่างงานจริง: เก็บเวลา ชื่อเครื่อง และพื้นที่ดิสก์ของ Gateway ทุก 5 วินาทีลง log โดยยังใช้ Terminal ทำงานอื่นได้</p>
+<p>ทบทวน <code>&amp;</code>, <code>nohup</code>, <code>$!</code> และ signal ใน <a href="05-lab-05-linux-processes-และ-resource-monitoring.html#4-background-job">LAB 05 - Background Job</a> ก่อนเริ่ม</p>
+<p>สร้างไฟล์:</p>
+<pre class="language-bash"><code>mkdir -p ~/scripts ~/logs
+nano ~/scripts/gateway-monitor.sh</code></pre>
+<p>ใส่:</p>
+<pre class="language-bash"><code>#!/bin/bash
+
+trap &#x27;echo &quot;Monitor stopped&quot;; exit 0&#x27; TERM
+
+while true
+do
+    printf &#x27;%s host=%s\n&#x27; &quot;$(date &#x27;+%Y-%m-%dT%H:%M:%S%z&#x27;)&quot; &quot;$(hostname)&quot;
+    df -h / | tail -n 1
+    sleep 5
+done</code></pre>
+<p><code>trap</code> ให้สคริปต์จบอย่างเป็นระเบียบเมื่อได้รับ <code>SIGTERM</code> ถ้ากำลังรอ <code>sleep</code> อาจใช้เวลาไม่เกินประมาณ 5 วินาทีก่อนจบ</p>
+<h3 id="10-1-เริ่มและเก็บ-pid">10.1 เริ่มและเก็บ PID</h3>
+<p>รันเพียงครั้งเดียว ไม่ต้องรันซ้ำทุกครั้งที่ต้องการดู log:</p>
+<pre class="language-bash"><code>nohup bash &quot;$HOME/scripts/gateway-monitor.sh&quot; &gt;&gt; ~/logs/gateway-monitor.log 2&gt;&amp;1 &lt; /dev/null &amp;
+monitor_pid=$!
+printf &#x27;%s\n&#x27; &quot;$monitor_pid&quot; &gt; ~/logs/gateway-monitor.pid
+ps -p &quot;$monitor_pid&quot; -o pid,user,stat,args</code></pre>
+<p>ใช้ <code>bash</code> เรียกไฟล์โดยตรง จึงไม่จำเป็นต้อง <code>chmod +x</code> ในตัวอย่างนี้ <code>&gt;&gt;</code> เก็บ log ต่อจากเดิม และไฟล์ <code>.pid</code> ช่วยจำ PID เมื่อต้องตรวจจาก Terminal อีกหน้าต่าง</p>
+<h3 id="10-2-ดู-log">10.2 ดู Log</h3>
+<pre class="language-bash"><code>tail -n 20 ~/logs/gateway-monitor.log
+tail -f ~/logs/gateway-monitor.log</code></pre>
+<p><code>tail -f</code> แสดงบรรทัดใหม่ต่อเนื่อง กด <code>Ctrl+C</code> เพื่อหยุดดู log เท่านั้น ตัว <code>gateway-monitor.sh</code> ยังทำงานอยู่</p>
+<p>ตัวอย่างผลลัพธ์ (เวลา ชื่อเครื่อง และค่าดิสก์จะแตกต่างกัน):</p>
+<pre class="language-text"><code>2026-10-07T10:00:00+0700 host=raspberrypi
+overlay  100G  20G  80G  20% /</code></pre>
+<h3 id="10-3-หยุดเฉพาะสคริปต์นี้">10.3 หยุดเฉพาะสคริปต์นี้</h3>
+<p>อ่าน PID แล้วตรวจชื่อคำสั่งก่อน:</p>
+<pre class="language-bash"><code>monitor_pid=$(cat ~/logs/gateway-monitor.pid)
+ps -p &quot;$monitor_pid&quot; -o pid,user,stat,args</code></pre>
+<p>ต้องเห็น <code>bash /home/piuser/scripts/gateway-monitor.sh</code> จึงหยุดด้วย:</p>
+<pre class="language-bash"><code>kill &quot;$monitor_pid&quot;</code></pre>
+<p>รอประมาณ 5 วินาทีแล้วตรวจ:</p>
+<pre class="language-bash"><code>ps -p &quot;$monitor_pid&quot; -o pid,user,stat,args
+tail -n 5 ~/logs/gateway-monitor.log</code></pre>
+<p>ไม่ควรพบสคริปต์เดิมใน <code>ps</code> และ log ควรมี <code>Monitor stopped</code> จากนั้นลบไฟล์ PID ที่ไม่ใช้งานแล้ว:</p>
+<pre class="language-bash"><code>rm -f ~/logs/gateway-monitor.pid</code></pre>
+<blockquote>
+ไฟล์ PID ไม่ใช่หลักฐานว่าโปรแกรมยังทำงานอยู่ ถ้าโปรแกรมจบหรือ Container restart เลข PID อาจถูกใช้โดยโปรแกรมอื่น ต้องตรวจชื่อ Process ก่อน <code>kill</code> ทุกครั้ง ถ้าไม่ตรง ห้ามใช้ PID นั้น และไม่ควรใช้ <code>pkill bash</code> เพราะจะกระทบ Shell อื่น
+</blockquote>
+<blockquote>
+สคริปต์นี้เก็บค่าดิสก์ที่ Container มองเห็น ไม่ใช่ดิสก์ของ Raspberry Pi จริงโดยตรง และ log จะโตต่อเนื่อง งานใช้งานระยะยาวต้องจัดการขนาด/หมุนเวียน log และใช้ตัวจัดการ service ตามสภาพแวดล้อม ส่วน <code>nohup</code> ใช้ฝึกการเริ่มและดูแล Process ในแล็บนี้
+</blockquote>
 <h2 id="แบบฝึกหัด">แบบฝึกหัด</h2>
 <p>สร้าง <code>iot-status.sh</code> ที่:</p>
 <ol>
@@ -164,6 +213,7 @@ echo $?</code></pre>
 <li>แสดง <code>NETWORK=OK</code> หรือ <code>NETWORK=FAILED</code></li>
 <li>บันทึกผลลง <code>~/logs/iot-status.log</code></li>
 </ol>
+<p>ต่อยอด: รัน <code>gateway-monitor.sh</code> แบบ Background ให้ log มีข้อมูลอย่างน้อย 3 รอบ เปิดดูจาก Terminal อีกหน้าต่าง แล้วหยุดเฉพาะสคริปต์โดยไม่ Restart Container</p>
 <h2 id="คำถามท้าย-lab">คำถามท้าย LAB</h2>
 <ol>
 <li>Shebang คืออะไร</li>
@@ -171,6 +221,8 @@ echo $?</code></pre>
 <li><code>$1</code>, <code>$2</code> คืออะไร</li>
 <li><code>$?</code> คืออะไร</li>
 <li>Script ช่วยงาน Raspberry Pi อย่างไร</li>
+<li><code>Ctrl+C</code> ขณะดู <code>tail -f</code> หยุดสคริปต์ที่สร้าง log ด้วยหรือไม่</li>
+<li>ทำไมต้องตรวจชื่อ Process ก่อนใช้ PID จากไฟล์ <code>.pid</code></li>
 </ol>
 <p><strong>LAB ถัดไป: LAB 10 - Python บน Linux</strong></p>
     </main>

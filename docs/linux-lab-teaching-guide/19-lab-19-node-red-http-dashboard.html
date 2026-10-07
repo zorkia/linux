@@ -48,9 +48,14 @@
 <h2 id="วัตถุประสงค์">วัตถุประสงค์</h2>
 <p>สร้าง Web/API Endpoint จาก Node-RED โดยไม่ผูกกับ Dashboard package รุ่นใดรุ่นหนึ่ง</p>
 <h2 id="เตรียม">เตรียม</h2>
+<p>ใช้ Node-RED Process เดิมจาก LAB 17-18 ได้ ดูวิธีเริ่ม ตรวจ log และหยุดโปรแกรมใน <a href="17-lab-17-node-red.html#start">LAB 17 - Start</a> และพื้นฐาน <a href="05-lab-05-linux-processes-และ-resource-monitoring.html#12-nohup-และการปิด-terminal">LAB 05 - nohup</a></p>
 <pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
 <pre class="language-bash"><code>su - piuser
-pgrep -af node-red || nohup node-red &gt; ~/node-red.log 2&gt;&amp;1 &amp;</code></pre>
+if ! pgrep -f node-red &gt; /dev/null; then
+    nohup node-red &gt;&gt; ~/node-red.log 2&gt;&amp;1 &lt; /dev/null &amp;
+    node_red_pid=$!
+    printf &#x27;%s\n&#x27; &quot;$node_red_pid&quot; &gt; ~/node-red.pid
+fi</code></pre>
 <h2 id="http-api">HTTP API</h2>
 <p>สร้าง Flow:</p>
 <pre class="language-text"><code>http in → function → http response</code></pre>

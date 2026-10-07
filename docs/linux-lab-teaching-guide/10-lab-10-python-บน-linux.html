@@ -152,7 +152,44 @@ print(response.headers.get(&quot;content-type&quot;))</code></pre>
 <p>ค้นหา:</p>
 <pre class="language-bash"><code>ps aux | grep sensor_loop.py</code></pre>
 <p>นี่เชื่อมโยง LAB Python กับ Process Management</p>
-<h2 id="12-ข้อจำกัดของ-docker">12. ข้อจำกัดของ Docker</h2>
+<h2 id="12-python-background-process">12. Python Background Process</h2>
+<p>ใช้ <code>sensor_loop.py</code> จากหัวข้อ 5 จำลองงานอ่าน sensor ต่อเนื่อง โดยเก็บข้อมูลลง log แทนการครอง Terminal</p>
+<p>ทบทวน <a href="05-lab-05-linux-processes-และ-resource-monitoring.html#12-nohup-และการปิด-terminal">LAB 05 - nohup</a> และ <a href="09-lab-09-bash-shell-script.html#10-bash-script-แบบ-background">LAB 09 - Bash Background</a></p>
+<p>กลับ Terminal ที่รัน <code>sensor_loop.py</code> แบบ Foreground แล้วกด <code>Ctrl+C</code> หยุดตัวเดิมก่อน เพื่อไม่ให้เกิด Process ซ้ำ ขั้นตอนต่อไปทำใน Bash ของ <code>piuser</code> ภายใน Container</p>
+<h3 id="12-1-เริ่มและเก็บ-pid">12.1 เริ่มและเก็บ PID</h3>
+<pre class="language-bash"><code>cd ~/python-lab
+nohup python3 -u &quot;$HOME/python-lab/sensor_loop.py&quot; &gt;&gt; ~/python-lab/sensor-loop.log 2&gt;&amp;1 &lt; /dev/null &amp;
+sensor_pid=$!
+printf &#x27;%s\n&#x27; &quot;$sensor_pid&quot; &gt; ~/python-lab/sensor-loop.pid
+ps -p &quot;$sensor_pid&quot; -o pid,user,stat,args</code></pre>
+<p><code>-u</code> ให้ Python เขียน stdout/stderr โดยไม่ buffer จึงเห็น <code>print()</code> ใน log ทันทีแม้ output ไม่ได้ส่งไป Terminal ส่วน <code>2&gt;&amp;1</code> เก็บข้อความผิดพลาดลง log เดียวกัน</p>
+<p>ดูรายละเอียดใน <a href="https://docs.python.org/3/using/cmdline.html#cmdoption-u">Python: ตัวเลือก -u</a></p>
+<p>สคริปต์นี้ใช้เฉพาะ Standard Library จึงใช้ <code>python3</code> ได้ ถ้าสคริปต์ใช้แพ็กเกจที่ติดตั้งใน venv ให้ใช้ interpreter เต็ม เช่น <code>~/python-lab/venv/bin/python</code> แทน <code>python3</code> เพื่อเลือก environment ที่ถูกต้อง</p>
+<h3 id="12-2-ตรวจ-process-และ-log">12.2 ตรวจ Process และ Log</h3>
+<pre class="language-bash"><code>sensor_pid=$(cat ~/python-lab/sensor-loop.pid)
+ps -p &quot;$sensor_pid&quot; -o pid,user,stat,args
+tail -n 10 ~/python-lab/sensor-loop.log
+tail -f ~/python-lab/sensor-loop.log</code></pre>
+<p>ควรมีข้อมูล sensor ใหม่ทุก 2 วินาที กด <code>Ctrl+C</code> ออกจาก <code>tail -f</code> แล้ว Python ยังทำงานต่อ ห้ามเริ่มสคริปต์ซ้ำเพียงเพราะไม่ได้เห็นข้อมูลใน Terminal</p>
+<h3 id="12-3-ตรวจจาก-terminal-อีกหน้าต่าง">12.3 ตรวจจาก Terminal อีกหน้าต่าง</h3>
+<p>บน Windows/macOS host:</p>
+<pre class="language-powershell"><code>docker exec -it -u piuser rpi-lab bash</code></pre>
+<p>ภายใน Container:</p>
+<pre class="language-bash"><code>sensor_pid=$(cat ~/python-lab/sensor-loop.pid)
+ps -p &quot;$sensor_pid&quot; -o pid,user,stat,args
+tail -n 10 ~/python-lab/sensor-loop.log</code></pre>
+<p><code>jobs</code> ใน Shell ใหม่นี้จะไม่แสดงงานจาก Shell เดิม ให้ใช้ PID ตรวจด้วย <code>ps</code> แทน สามารถ <code>exit</code> จาก session ที่เปิดด้วย <code>docker exec</code> นี้ได้โดยไม่หยุด Bash หลักของ Container</p>
+<h3 id="12-4-หยุดเฉพาะ-python-script">12.4 หยุดเฉพาะ Python Script</h3>
+<p>หลังตรวจว่าคำสั่งของ PID นั้นเป็น <code>python3 -u /home/piuser/python-lab/sensor_loop.py</code> จริงแล้ว:</p>
+<pre class="language-bash"><code>kill &quot;$sensor_pid&quot;</code></pre>
+<p>ตรวจอีกครั้ง:</p>
+<pre class="language-bash"><code>ps -p &quot;$sensor_pid&quot; -o pid,user,stat,args</code></pre>
+<p>ไม่ควรพบสคริปต์เดิมแล้วจึงลบไฟล์ PID:</p>
+<pre class="language-bash"><code>rm -f ~/python-lab/sensor-loop.pid</code></pre>
+<blockquote>
+PID อาจถูกใช้ซ้ำหลังโปรแกรมจบหรือ Container restart ต้องตรวจชื่อ Process ก่อน <code>kill</code> และไม่ใช้ <code>pkill python3</code> เพราะอาจหยุด Python API หรือสคริปต์อื่นไปด้วย <code>nohup</code> ไม่ restart สคริปต์อัตโนมัติ และไม่ทำงานต่อเมื่อ Container หยุด
+</blockquote>
+<h2 id="13-ข้อจำกัดของ-docker">13. ข้อจำกัดของ Docker</h2>
 <p>Python/Linux application ทำงานใกล้เคียง Raspberry Pi มาก แต่ LAB นี้ไม่ได้จำลอง GPIO, I2C, SPI, BLE หรือ Wi-Fi hardware จริง</p>
 <h2 id="แบบฝึกหัด">แบบฝึกหัด</h2>
 <p>สร้าง <code>iot_device.py</code> ที่:</p>
@@ -164,6 +201,7 @@ print(response.headers.get(&quot;content-type&quot;))</code></pre>
 <li>แสดงข้อมูลทุก 3 วินาที</li>
 <li>หยุดด้วย <code>Ctrl+C</code></li>
 </ol>
+<p>จากนั้นรัน <code>iot_device.py</code> แบบ Background เก็บ PID และ log ตามหัวข้อ 12 ตรวจว่าข้อมูลเพิ่มทุก 3 วินาที แล้วหยุดเฉพาะสคริปต์ด้วย <code>kill</code> โดยไม่ Restart Container</p>
 <p>ตัวอย่างรูปแบบ:</p>
 <pre class="language-json"><code>{&quot;device_id&quot;:&quot;ESP32-001&quot;,&quot;temp&quot;:30.5,&quot;humi&quot;:70.2,&quot;light&quot;:1250}</code></pre>
 <h2 id="คำถามท้าย-lab">คำถามท้าย LAB</h2>
@@ -173,6 +211,8 @@ print(response.headers.get(&quot;content-type&quot;))</code></pre>
 <li><code>Ctrl+C</code> ส่งผลอย่างไรต่อโปรแกรม Loop</li>
 <li>JSON เหมาะกับ IoT อย่างไร</li>
 <li>ส่วนใดของ Raspberry Pi ที่ Docker/Python Lab นี้ยังจำลองไม่ได้</li>
+<li>ทำไมจึงใช้ <code>python3 -u</code> เมื่อส่ง output ลง log</li>
+<li>ถ้าเปิด Terminal ใหม่ ทำไม <code>jobs</code> จึงไม่แสดง Python จาก Shell เดิม</li>
 </ol>
 <h2 id="ผลลัพธ์เมื่อจบ-lab-10">ผลลัพธ์เมื่อจบ LAB 10</h2>
 <p>นักศึกษามีพื้นฐาน:</p>

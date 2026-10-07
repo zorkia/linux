@@ -48,10 +48,15 @@
 <h2 id="วัตถุประสงค์">วัตถุประสงค์</h2>
 <p>เชื่อม Node-RED กับ Mosquitto เพื่อรับและประมวลผลข้อมูล IoT</p>
 <h2 id="เตรียม">เตรียม</h2>
+<p>ถ้า Node-RED จาก LAB 17 ยังทำงานอยู่ ไม่ต้องเริ่มซ้ำ ทบทวน <a href="17-lab-17-node-red.html#start">LAB 17 - Start</a> และ <a href="05-lab-05-linux-processes-และ-resource-monitoring.html#12-nohup-และการปิด-terminal">LAB 05 - nohup</a></p>
 <pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
 <pre class="language-bash"><code>su - piuser
 pgrep mosquitto || sudo mosquitto -c /etc/mosquitto/mosquitto.conf -d
-pgrep -af node-red || nohup node-red &gt; ~/node-red.log 2&gt;&amp;1 &amp;</code></pre>
+if ! pgrep -f node-red &gt; /dev/null; then
+    nohup node-red &gt;&gt; ~/node-red.log 2&gt;&amp;1 &lt; /dev/null &amp;
+    node_red_pid=$!
+    printf &#x27;%s\n&#x27; &quot;$node_red_pid&quot; &gt; ~/node-red.pid
+fi</code></pre>
 <h2 id="architecture">Architecture</h2>
 <pre class="language-text"><code>Python Sensor → MQTT → Mosquitto → Node-RED</code></pre>
 <p>ทุกบริการใน LAB นี้ทำงานอยู่ใน Container เดียวกัน ดังนั้น Node-RED ที่อยู่ใน Container ให้ตั้ง MQTT Broker เป็น <code>127.0.0.1:1883</code></p>

@@ -229,9 +229,16 @@ class Handler(BaseHTTPRequestHandler):
 init_db()
 HTTPServer((&quot;127.0.0.1&quot;, 5000), Handler).serve_forever()</code></pre>
 <p>รัน API:</p>
+<p>ทบทวนการรัน Python แบบ Background การอ่าน log และการหยุดเฉพาะ PID ใน <a href="10-lab-10-python-บน-linux.html#12-python-background-process">LAB 10 - Python Background</a> รันคำสั่งเริ่ม API เพียงครั้งเดียว ถ้ามีตัวเดิมทำงานอยู่ ให้ตรวจและหยุดตัวเดิมก่อน</p>
 <pre class="language-bash"><code>cd ~/iot-web
-nohup python3 app.py &gt; ~/iot-web/api.log 2&gt;&amp;1 &amp;
+nohup python3 -u &quot;$HOME/iot-web/app.py&quot; &gt;&gt; ~/iot-web/api.log 2&gt;&amp;1 &lt; /dev/null &amp;
+api_pid=$!
+printf &#x27;%s\n&#x27; &quot;$api_pid&quot; &gt; ~/iot-web/api.pid</code></pre>
+<p>ตรวจ Process และ log ก่อนทดสอบ API:</p>
+<pre class="language-bash"><code>ps -p &quot;$api_pid&quot; -o pid,user,stat,args
+tail -n 20 ~/iot-web/api.log
 curl http://127.0.0.1:5000/api/logs</code></pre>
+<p>ถ้าเชื่อมต่อไม่ได้ ให้ดู <code>api.log</code> เช่นข้อผิดพลาด port ถูกใช้งานอยู่ กด <code>Ctrl+C</code> ขณะดู <code>tail -f</code> จะหยุดเฉพาะการดู log ไม่ใช่ API เมื่อต้องการหยุด API ใช้ PID ใน <code>api.pid</code> หลังตรวจชื่อ Process ตาม LAB 10 ไม่ใช้ <code>pkill python3</code></p>
 <p>ทดสอบบันทึกข้อมูล:</p>
 <pre class="language-bash"><code>curl -X POST http://127.0.0.1:5000/api/logs \
   -H &quot;Content-Type: application/json&quot; \

@@ -64,11 +64,17 @@ node-red --version</code></pre>
 <pre class="language-bash"><code>node-red</code></pre>
 <p>หยุดด้วย <code>Ctrl+C</code></p>
 <p>Run background:</p>
-<pre class="language-bash"><code>nohup node-red &gt; ~/node-red.log 2&gt;&amp;1 &amp;
-pgrep -af node-red
+<p>ใช้หลักการ <code>nohup</code>, redirect log และ <code>$!</code> จาก <a href="05-lab-05-linux-processes-และ-resource-monitoring.html#12-nohup-และการปิด-terminal">LAB 05 - nohup</a> และ <a href="09-lab-09-bash-shell-script.html#10-bash-script-แบบ-background">LAB 09 - Bash Background</a> หยุดตัว Foreground ด้วย <code>Ctrl+C</code> ก่อน แล้วเริ่มเพียงครั้งเดียว:</p>
+<pre class="language-bash"><code>nohup node-red &gt;&gt; ~/node-red.log 2&gt;&amp;1 &lt; /dev/null &amp;
+node_red_pid=$!
+printf &#x27;%s\n&#x27; &quot;$node_red_pid&quot; &gt; ~/node-red.pid
+ps -p &quot;$node_red_pid&quot; -o pid,user,stat,args</code></pre>
+<p>ตรวจหลังเริ่ม (Node-RED อาจใช้เวลาสักครู่ก่อนพร้อมรับ request):</p>
+<pre class="language-bash"><code>pgrep -af node-red
 ss -tuln | grep 1880
 tail ~/node-red.log
 curl -I http://127.0.0.1:1880</code></pre>
+<p>ถ้าต้องการดู log ต่อเนื่อง ใช้ <code>tail -f ~/node-red.log</code> แล้วกด <code>Ctrl+C</code> เพื่อหยุดดู ไม่ได้หยุด Node-RED ส่วนการหยุดโปรแกรมให้ตรวจ PID ใน <code>~/node-red.pid</code> ว่าเป็น Node-RED จริงก่อน <code>kill</code> ตาม LAB 09</p>
 <p>เปิด Browser บน Windows/macOS:</p>
 <pre class="language-url"><code>http://localhost:1880</code></pre>
 <p>ถ้าเครื่องอื่นอยู่ใน LAN เดียวกันและ Firewall อนุญาต:</p>

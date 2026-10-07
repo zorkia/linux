@@ -43,10 +43,10 @@
 <nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="04-lab-04-linux-package-management.html">ก่อนหน้า: LAB 04 - Linux Package Management</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="06-lab-06-linux-networking.html">ถัดไป: LAB 06 - Linux Networking</a></nav>
 <aside class="callout callout-info">
 <div class="callout-title">เครื่องมือสำหรับ LAB นี้</div>
-<p><code>ps</code>, <code>top</code>, <code>pgrep</code>, <code>pkill</code>, <code>free</code> และ <code>uptime</code> มาจากแพ็กเกจ <code>procps</code> ส่วน <code>htop</code> ต้องติดตั้งแพ็กเกจ <code>htop</code> ดู <a href="../linux-lab-software-setup.html">รวมคำสั่งและการติดตั้งล่วงหน้า</a></p>
+<p><code>ps</code>, <code>top</code>, <code>pgrep</code>, <code>pkill</code>, <code>free</code> และ <code>uptime</code> มาจากแพ็กเกจ <code>procps</code> ส่วน <code>htop</code> ต้องติดตั้งแพ็กเกจ <code>htop</code> ดู <a href="../linux-lab-software-setup.html">รวมคำสั่งและการติดตั้งล่วงหน้า</a><br><code>jobs</code>, <code>fg</code>, <code>bg</code>, <code>wait</code> และ <code>kill</code> เป็นคำสั่งภายใน Bash ส่วน <code>nohup</code> มีอยู่ใน Image แล้ว</p>
 </aside>
 <h2 id="วัตถุประสงค์">วัตถุประสงค์</h2>
-<p>ฝึกตรวจสอบ Process, PID, CPU, Memory และการหยุด Process ซึ่งจำเป็นต่อการดูแล Raspberry Pi</p>
+<p>ฝึกตรวจสอบ Process, PID, CPU, Memory และการเริ่ม/หยุด Background Process ซึ่งจำเป็นต่อการดูแล Raspberry Pi</p>
 <h2 id="เริ่มต้น">เริ่มต้น</h2>
 <pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
 <pre class="language-bash"><code>su - piuser</code></pre>
@@ -66,10 +66,36 @@ ps aux</code></pre>
 <pre class="language-bash"><code>ps aux | grep sleep
 pgrep sleep</code></pre>
 <h2 id="4-background-job">4. Background Job</h2>
-<pre class="language-bash"><code>jobs</code></pre>
-<p>สร้างอีกตัว:</p>
+<p>Foreground คือโปรแกรมที่กำลังครอง Terminal เช่น <code>top</code> ส่วน Background คือโปรแกรมที่ทำงานไปพร้อมกับการที่เราใช้ Shell พิมพ์คำสั่งอื่นได้</p>
+<p>เครื่องหมาย <code>&amp;</code> ท้ายคำสั่งทำให้ Shell เริ่มงานแบบ Background แต่ไม่ได้ทำให้โปรแกรมเร็วขึ้น และไม่ได้รับประกันว่าจะทำงานต่อเมื่อปิด Terminal</p>
+<pre class="language-bash"><code>jobs -l</code></pre>
+<p><code>jobs -l</code> แสดง Job ID และ PID ของงานใน Shell นี้ Job ID เช่น <code>[1]</code> ไม่ใช่ PID ของ Process และ Terminal อีกหน้าต่างจะมีรายการ <code>jobs</code> ของตัวเอง</p>
+<h3 id="4-1-สลับ-foreground-background">4.1 สลับ Foreground / Background</h3>
+<p>สร้างงานใหม่:</p>
 <pre class="language-bash"><code>sleep 500 &amp;
-jobs</code></pre>
+jobs -l</code></pre>
+<p>นำงานปัจจุบันกลับมา Foreground (<code>%+</code> หมายถึง current job ที่ Bash ทำเครื่องหมาย <code>+</code> ในรายการ <code>jobs</code>):</p>
+<pre class="language-bash"><code>fg %+</code></pre>
+<p>ตอนนี้ Shell จะรอ <code>sleep</code> กด <code>Ctrl+Z</code> เพื่อพักงาน แล้วตรวจ:</p>
+<pre class="language-bash"><code>jobs -l</code></pre>
+<p>งานจะเป็น <code>Stopped</code> ซึ่งยังไม่ถูกปิด ให้ทำงานต่อใน Background:</p>
+<pre class="language-bash"><code>bg %+
+jobs -l</code></pre>
+<p>นำกลับมา Foreground แล้วกด <code>Ctrl+C</code> เพื่อหยุดงานทดลองนี้:</p>
+<pre class="language-bash"><code>fg %+</code></pre>
+<p><code>fg</code> / <code>bg</code> ใช้กับงานใน interactive Bash เดียวกัน ถ้าจะเลือกงานอื่น ให้ใช้ Job ID เช่น <code>fg %1</code> โดยดูเลขจาก <code>jobs</code> ก่อน</p>
+<h3 id="4-2-เก็บ-pid-ด้วย">4.2 เก็บ PID ด้วย <code>$!</code></h3>
+<p><code>$!</code> คือ PID ของงาน Background ที่เพิ่งเริ่มล่าสุด ต้องเก็บค่าทันที ก่อนเริ่มงานอื่น:</p>
+<pre class="language-bash"><code>sleep 300 &amp;
+sleep_pid=$!
+echo &quot;$sleep_pid&quot;
+ps -p &quot;$sleep_pid&quot; -o pid,user,stat,args</code></pre>
+<p>หยุดเฉพาะ Process ที่เก็บ PID ไว้ แล้วรอให้จบ:</p>
+<pre class="language-bash"><code>kill &quot;$sleep_pid&quot;
+wait &quot;$sleep_pid&quot;
+echo $?</code></pre>
+<p><code>kill</code> แบบไม่ระบุ signal ส่ง <code>SIGTERM</code> เพื่อขอให้โปรแกรมจบ ส่วน <code>wait</code> รอ child process ของ Shell นี้และคืน exit status ในตัวอย่าง <code>sleep</code> ที่ถูก <code>SIGTERM</code> ค่าปกติใน Bash คือ <code>143</code> ไม่ใช่ความผิดพลาดของคำสั่ง <code>kill</code></p>
+<p>ถ้าเปิด Shell ใหม่ จะใช้ <code>ps</code> / <code>kill</code> กับ PID ได้ แต่ใช้ <code>wait</code> กับ Process ที่ไม่ได้เริ่มจาก Shell นั้นไม่ได้</p>
 <h2 id="5-หยุด-process">5. หยุด Process</h2>
 <pre class="language-bash"><code>pgrep sleep</code></pre>
 <p>เลือก PID แล้ว:</p>
@@ -97,6 +123,57 @@ du -sh ~/linux-lab</code></pre>
 <blockquote>
 ค่า uptime ใน Container ไม่ควรถูกตีความว่าเป็นเวลาเปิด Raspberry Pi จริง เพราะ Container แชร์ Kernel environment ของ Docker
 </blockquote>
+<h2 id="12-nohup-และการปิด-terminal">12. nohup และการปิด Terminal</h2>
+<p><code>nohup</code> ให้โปรแกรมไม่หยุดเพราะ signal <code>SIGHUP</code> ที่เกี่ยวกับการปิด session แต่ต้องใส่ <code>&amp;</code> เองจึงจะรันแบบ Background</p>
+<p>ทดลองรันและเก็บ PID:</p>
+<pre class="language-bash"><code>nohup sleep 300 &gt; ~/sleep.log 2&gt;&amp;1 &lt; /dev/null &amp;
+sleep_pid=$!
+ps -p &quot;$sleep_pid&quot; -o pid,user,stat,args</code></pre>
+<table>
+<thead><tr>
+<th>ส่วนของคำสั่ง</th>
+<th>หน้าที่</th>
+</tr></thead><tbody>
+<tr>
+<td><code>nohup</code></td>
+<td>ให้โปรแกรม ignore <code>SIGHUP</code></td>
+</tr>
+<tr>
+<td><code>&gt; ~/sleep.log</code></td>
+<td>เขียน stdout ลงไฟล์ โดยแทนที่เนื้อหาเดิม</td>
+</tr>
+<tr>
+<td><code>&gt;&gt; ~/sleep.log</code></td>
+<td>ใช้แทน <code>&gt;</code> เมื่อต้องการเพิ่ม log ต่อท้าย</td>
+</tr>
+<tr>
+<td><code>2&gt;&amp;1</code></td>
+<td>ให้ stderr ไปที่เดียวกับ stdout ต้องวางหลังการ redirect stdout</td>
+</tr>
+<tr>
+<td><code>&lt; /dev/null</code></td>
+<td>ไม่อ่าน input จาก Terminal</td>
+</tr>
+<tr>
+<td><code>&amp;</code></td>
+<td>เริ่มงาน Background</td>
+</tr>
+<tr>
+<td><code>$!</code></td>
+<td>PID ของงานที่เพิ่งเริ่ม</td>
+</tr>
+</tbody></table>
+<p><code>sleep</code> ไม่พิมพ์ข้อมูลตามปกติ ดังนั้น <code>sleep.log</code> อาจว่าง ดูตัวอย่างที่มี log ใช้งานจริงใน <a href="09-lab-09-bash-shell-script.html#10-bash-script-แบบ-background">LAB 09 - Bash Background</a> และ <a href="10-lab-10-python-บน-linux.html#12-python-background-process">LAB 10 - Python Background</a></p>
+<p>จบการทดลองนี้ด้วย:</p>
+<pre class="language-bash"><code>kill &quot;$sleep_pid&quot;
+wait &quot;$sleep_pid&quot;</code></pre>
+<h3 id="ข้อจำกัดเมื่อใช้-docker">ข้อจำกัดเมื่อใช้ Docker</h3>
+<p><code>nohup</code> ไม่ใช่ตัวจัดการ service: ไม่ restart โปรแกรมเมื่อ crash ไม่เริ่มงานใหม่หลัง reboot และไม่ทำให้ Process อยู่ต่อเมื่อ Container หยุด</p>
+<p>ใน Container นี้ Bash หลักเป็น PID 1 ถ้า <code>exit</code> จน Bash หลักจบ Container จะหยุดและ Background Process ทั้งหมดจบด้วย</p>
+<p>ถ้า attach ผ่าน <code>docker start -ai rpi-lab</code> ให้กด <code>Ctrl+P</code> แล้ว <code>Ctrl+Q</code> เพื่อ detach โดยไม่หยุด Container ส่วน <code>exit</code> จาก Shell ที่เปิดด้วย <code>docker exec</code> จะปิดเฉพาะ session นั้น</p>
+<p>วิธีฝึกปิด session โดยไม่แตะ Bash หลัก: เปิด Terminal บน Windows/macOS อีกหน้าต่าง แล้วเข้า Shell ใหม่:</p>
+<pre class="language-powershell"><code>docker exec -it -u piuser rpi-lab bash</code></pre>
+<p>คำสั่ง Background ในแล็บนี้ต้องรันภายใน Bash ของ Container ไม่ใช่ PowerShell เมื่อหยุดแล้ว start Container ใหม่ ต้องเริ่มสคริปต์ใหม่เอง แม้ไฟล์สคริปต์และ log ใน Container เดิมยังอยู่</p>
 <h2 id="แบบฝึกหัด">แบบฝึกหัด</h2>
 <pre class="language-bash"><code>sleep 600 &amp;
 sleep 700 &amp;
@@ -104,6 +181,7 @@ jobs
 pgrep sleep
 ps aux | grep sleep</code></pre>
 <p>จากนั้นหยุด Process ทั้งหมดโดยไม่ Restart Container</p>
+<p>ทดลองเพิ่มโดยรัน <code>sleep 300 &amp;</code> เก็บ <code>$!</code> แล้วนำงานกลับมา Foreground พักด้วย <code>Ctrl+Z</code> ทำงานต่อด้วย <code>bg</code> และหยุดเฉพาะ PID นั้น</p>
 <h2 id="คำถามท้าย-lab">คำถามท้าย LAB</h2>
 <ol>
 <li>Process คืออะไร</li>
@@ -111,7 +189,18 @@ ps aux | grep sleep</code></pre>
 <li><code>ps</code>, <code>top</code>, <code>htop</code> ต่างกันอย่างไร</li>
 <li><code>kill</code> กับ <code>pkill</code> ต่างกันอย่างไร</li>
 <li><code>free -h</code> และ <code>df -h</code> วัดคนละ Resource อย่างไร</li>
+<li><code>&amp;</code> กับ <code>nohup</code> ทำหน้าที่ต่างกันอย่างไร</li>
+<li>Job ID กับ PID ต่างกันอย่างไร และ <code>$!</code> เก็บค่าอะไร</li>
+<li>ถ้า Container หยุด โปรแกรมที่รันด้วย <code>nohup</code> จะทำงานต่อหรือไม่</li>
 </ol>
+<h2 id="อ้างอิง">อ้างอิง</h2>
+<ul>
+<li><a href="https://www.gnu.org/software/bash/manual/html_node/Job-Control-Basics.html">Bash Job Control</a></li>
+<li><a href="https://www.gnu.org/software/bash/manual/html_node/Job-Control-Builtins.html">Bash Job Control Builtins</a></li>
+<li><a href="https://www.gnu.org/software/coreutils/manual/html_node/nohup-invocation.html">GNU nohup</a></li>
+<li><a href="https://docs.docker.com/reference/cli/docker/container/attach/">Docker attach และ detach</a></li>
+<li><a href="https://docs.docker.com/reference/cli/docker/container/exec/">Docker exec และอายุของ Process</a></li>
+</ul>
 <p><strong>LAB ถัดไป: LAB 06 - Linux Networking</strong></p>
     </main>
   </div>

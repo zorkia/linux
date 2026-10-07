@@ -78,10 +78,20 @@ Web Form + Real-time Table
 <pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
 <pre class="language-bash"><code>su - piuser</code></pre>
 <h2 id="start-services">Start Services</h2>
+<p>ทบทวน <a href="05-lab-05-linux-processes-และ-resource-monitoring.html#12-nohup-และการปิด-terminal">LAB 05 - nohup</a>, <a href="10-lab-10-python-บน-linux.html#12-python-background-process">LAB 10 - Python Background</a> และ <a href="17-lab-17-node-red.html#start">LAB 17 - Node-RED Background</a> คำสั่งต่อไปตรวจตัวเดิมก่อนเริ่ม เพื่อไม่รัน service ซ้ำ:</p>
 <pre class="language-bash"><code>pgrep mosquitto || sudo mosquitto -c /etc/mosquitto/mosquitto.conf -d
 pgrep nginx || sudo nginx
-pgrep -af node-red || nohup node-red &gt; ~/node-red.log 2&gt;&amp;1 &amp;
-pgrep -af &quot;python3 app.py&quot; || nohup python3 ~/iot-web/app.py &gt; ~/iot-web/api.log 2&gt;&amp;1 &amp;</code></pre>
+if ! pgrep -f node-red &gt; /dev/null; then
+    nohup node-red &gt;&gt; ~/node-red.log 2&gt;&amp;1 &lt; /dev/null &amp;
+    node_red_pid=$!
+    printf &#x27;%s\n&#x27; &quot;$node_red_pid&quot; &gt; ~/node-red.pid
+fi
+if ! pgrep -f &quot;^python3 (-u )?($HOME/iot-web/)?app[.]py$&quot; &gt; /dev/null; then
+    nohup python3 -u &quot;$HOME/iot-web/app.py&quot; &gt;&gt; ~/iot-web/api.log 2&gt;&amp;1 &lt; /dev/null &amp;
+    api_pid=$!
+    printf &#x27;%s\n&#x27; &quot;$api_pid&quot; &gt; ~/iot-web/api.pid
+fi</code></pre>
+<p>เก็บ PID เฉพาะเมื่อเริ่ม Process ใหม่ ถ้ามีตัวเดิมอยู่ จะไม่เขียนทับไฟล์ PID ตรวจ log ได้จาก <code>~/node-red.log</code> และ <code>~/iot-web/api.log</code> ถ้าเพิ่งเริ่ม service ให้รอพร้อมก่อนทดสอบ port</p>
 <p>ตรวจ:</p>
 <pre class="language-bash"><code>ss -tuln</code></pre>
 <p>ควรพบ:</p>
@@ -96,6 +106,7 @@ pgrep -af &quot;python3 app.py&quot; || nohup python3 ~/iot-web/app.py &gt; ~/io
 1880/tcp -&gt; 0.0.0.0:1880
 1883/tcp -&gt; 0.0.0.0:1883</code></pre>
 <h2 id="start-collector">Start Collector</h2>
+<p>ตัวอย่างนี้รัน Foreground เพื่อดูข้อมูลที่รับทันที ถ้าต้องการ Background ให้ใช้ interpreter <code>~/python-lab/venv/bin/python</code> พร้อม <code>-u</code>, log และ PID ตาม LAB 10 ไม่ใช่ System Python และหยุดตัว Foreground ก่อนเริ่มใหม่</p>
 <pre class="language-bash"><code>cd ~/python-lab
 source venv/bin/activate
 python mqtt_to_sqlite.py</code></pre>
@@ -136,7 +147,7 @@ curl -I http://127.0.0.1:1880</code></pre>
 <pre class="language-bash"><code>ps aux | grep nginx
 ps aux | grep mosquitto
 ps aux | grep node-red
-ps aux | grep &#x27;python3 app.py&#x27;
+pgrep -af &quot;^python3 (-u )?($HOME/iot-web/)?app[.]py$&quot;
 ps aux | grep mqtt_to_sqlite
 ps aux | grep mqtt_publisher</code></pre>
 <h2 id="sql-statistics">SQL Statistics</h2>
