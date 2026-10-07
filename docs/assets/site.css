@@ -175,13 +175,6 @@ pre.language-diagram {
   --copy-error: #fca5a5;
 }
 
-.code-block-light {
-  --copy-color: #316460;
-  --copy-hover: rgba(7, 59, 58, 0.08);
-  --copy-success: #047857;
-  --copy-error: #b91c1c;
-}
-
 .code-block pre {
   margin: 0;
   padding-bottom: 54px;

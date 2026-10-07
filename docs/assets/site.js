@@ -1,5 +1,5 @@
 (() => {
-  const blocks = document.querySelectorAll('.content pre > code');
+  const blocks = document.querySelectorAll('.content pre:not(.language-text):not(.language-diagram) > code');
   if (!blocks.length) return;
 
   const status = document.createElement('div');
@@ -53,9 +53,6 @@
     const pre = code.parentElement;
     const block = document.createElement('div');
     block.className = 'code-block';
-    if (pre.matches('.language-text, .language-diagram')) {
-      block.classList.add('code-block-light');
-    }
     pre.before(block);
     block.append(pre);
 
