@@ -59,7 +59,7 @@ sudo apt install -y mosquitto mosquitto-clients nano procps iproute2</code></pre
 <p>สร้างไฟล์ config สำหรับ LAB:</p>
 <pre class="language-bash"><code>sudo nano /etc/mosquitto/conf.d/lab-listener.conf</code></pre>
 <p>ใส่:</p>
-<pre class="language-text"><code>listener 1883 0.0.0.0
+<pre class="language-conf"><code>listener 1883 0.0.0.0
 allow_anonymous true</code></pre>
 <blockquote>
 การตั้งค่านี้เหมาะสำหรับ LAB ในเครือข่ายปิดเท่านั้น ยังไม่ใช่ configuration สำหรับ production
@@ -102,11 +102,13 @@ mosquitto_pub -h 127.0.0.1 -t &quot;pkru/iot/001/light&quot; -m &quot;1250&quot;
 <p>แนวคิดสำคัญคือ เว็บฟอร์มและ MQTT เป็นคนละทางเข้า แต่สุดท้ายสามารถบันทึกลง SQLite ตารางเดียวกันได้</p>
 <h2 id="ทดสอบจาก-windows-หรือ-lan">ทดสอบจาก Windows หรือ LAN</h2>
 <p>ถ้า Container ถูกสร้างด้วย <code>-p 1883:1883</code> แล้ว Windows สามารถใช้ MQTT client เชื่อมต่อได้ที่:</p>
-<pre class="language-text"><code>Broker: localhost
-Port: 1883</code></pre>
+<p>Broker:</p>
+<pre class="language-plaintext"><code>localhost</code></pre>
+<p>Port: <code>1883</code></p>
 <p>เครื่องอื่นใน LAN ใช้:</p>
-<pre class="language-text"><code>Broker: IP-WINDOWS
-Port: 1883</code></pre>
+<p>Broker (แทน <code>IP-WINDOWS</code> ด้วย IP ของเครื่อง host):</p>
+<pre class="language-plaintext"><code>IP-WINDOWS</code></pre>
+<p>Port: <code>1883</code></p>
 <p>ถ้าเชื่อมต่อจากเครื่องอื่นไม่ได้ ให้ตรวจสอบ Windows Firewall ว่าอนุญาต port <code>1883</code> แล้วหรือยัง</p>
 <p>Wildcard:</p>
 <pre class="language-text"><code>+ = หนึ่งระดับ

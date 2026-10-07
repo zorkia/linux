@@ -333,8 +333,10 @@ curl http://127.0.0.1:5000/api/logs</code></pre>
 &lt;/html&gt;</code></pre>
 <h3 id="3-ตั้งค่า-nginx-proxy">3. ตั้งค่า Nginx Proxy</h3>
 <p>ขั้นตอนนี้ทำให้หน้าเว็บและ API ใช้ address เดียวกันผ่าน Nginx:</p>
-<pre class="language-text"><code>http://localhost:8080/status.html
-http://localhost:8080/api/logs</code></pre>
+<p>หน้าเว็บ:</p>
+<pre class="language-url"><code>http://localhost:8080/status.html</code></pre>
+<p>API:</p>
+<pre class="language-url"><code>http://localhost:8080/api/logs</code></pre>
 <p>ผู้ใช้ไม่ต้องเรียก Python API ที่ port <code>5000</code> โดยตรง เพราะ Nginx จะรับ <code>/api/</code> แล้วส่งต่อไปที่ <code>127.0.0.1:5000</code> ภายใน Container ให้เอง</p>
 <p>แก้ default site:</p>
 <pre class="language-bash"><code>sudo nano /etc/nginx/sites-enabled/default</code></pre>
@@ -360,7 +362,7 @@ http://localhost:8080/api/logs</code></pre>
 sudo nginx -s reload
 curl http://127.0.0.1/api/logs</code></pre>
 <p>เปิดจาก Browser บน Windows/macOS:</p>
-<pre class="language-text"><code>http://localhost:8080/status.html</code></pre>
+<pre class="language-url"><code>http://localhost:8080/status.html</code></pre>
 <p>เมื่อลองกรอกฟอร์ม ข้อมูลควรถูกบันทึกลง SQLite และตารางจะอัปเดตเองทุก 2 วินาที</p>
 <h2 id="แบบฝึกหัด">แบบฝึกหัด</h2>
 <p>เพิ่มอย่างน้อย 10 records จาก ESP32-01 และ ESP32-02 แล้วหา COUNT, AVG(temp), MAX(temp), MIN(humi) และจำนวนข้อมูลแยกตาม device</p>

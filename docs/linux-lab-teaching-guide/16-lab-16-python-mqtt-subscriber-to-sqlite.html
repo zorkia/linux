@@ -117,7 +117,7 @@ SELECT device_id, COUNT(*) FROM device_logs GROUP BY device_id;
 SELECT device_id, AVG(temperature) FROM device_logs GROUP BY device_id;
 .quit</code></pre>
 <p>เปิดหน้าเว็บจาก LAB 12:</p>
-<pre class="language-text"><code>http://localhost:8080/status.html</code></pre>
+<pre class="language-url"><code>http://localhost:8080/status.html</code></pre>
 <p>ถ้า Python API และ Nginx Proxy ยังทำงานอยู่ ตารางบนเว็บจะเห็นข้อมูลที่มาจาก MQTT ปนกับข้อมูลที่กรอกผ่านฟอร์ม เพราะใช้ SQLite ตาราง <code>device_logs</code> เดียวกัน</p>
 <h2 id="แบบฝึกหัด">แบบฝึกหัด</h2>
 <p>ให้ Collector รับอย่างน้อย 2 device IDs และพิสูจน์ด้วย <code>GROUP BY</code></p>

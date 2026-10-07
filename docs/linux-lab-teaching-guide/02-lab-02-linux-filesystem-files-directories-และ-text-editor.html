@@ -339,7 +339,7 @@ Hello Raspberry Pi</code></pre>
 <p>เปิดไฟล์</p>
 <pre class="language-bash"><code>nano hello.txt</code></pre>
 <p>เพิ่มข้อความ</p>
-<pre class="language-text"><code>Linux Lab
+<pre class="language-plaintext"><code>Linux Lab
 Docker Debian
 Raspberry Pi IoT</code></pre>
 <p>บันทึกด้วย</p>
@@ -354,7 +354,7 @@ Raspberry Pi IoT</code></pre>
 <p>สร้างไฟล์</p>
 <pre class="language-bash"><code>nano sensors.txt</code></pre>
 <p>ใส่ข้อมูล</p>
-<pre class="language-text"><code>ESP32-01,temp,30.5
+<pre class="language-csv"><code>ESP32-01,temp,30.5
 ESP32-01,humi,70.2
 ESP32-01,light,1250
 ESP32-02,temp,31.1
@@ -621,21 +621,21 @@ less</code></pre>
 └── scripts</code></pre>
 <p>สร้างด้วยคำสั่ง Linux เท่านั้น</p>
 <p>จากนั้นสร้างไฟล์</p>
-<pre class="language-text"><code>iot-project/config/device.conf</code></pre>
+<pre class="language-path"><code>iot-project/config/device.conf</code></pre>
 <p>ให้มีข้อมูล</p>
-<pre class="language-text"><code>device_id=ESP32-001
+<pre class="language-ini"><code>device_id=ESP32-001
 location=LAB
 mqtt_topic=pkru/iot/001</code></pre>
 <p>สร้างไฟล์</p>
-<pre class="language-text"><code>iot-project/data/current/sensor.txt</code></pre>
+<pre class="language-path"><code>iot-project/data/current/sensor.txt</code></pre>
 <p>ให้มีข้อมูล</p>
-<pre class="language-text"><code>temp=30.5
+<pre class="language-ini"><code>temp=30.5
 humi=70.2
 light=1250</code></pre>
 <p>คัดลอก <code>sensor.txt</code> ไปเก็บใน</p>
-<pre class="language-text"><code>iot-project/data/history/</code></pre>
+<pre class="language-path"><code>iot-project/data/history/</code></pre>
 <p>โดยเปลี่ยนชื่อเป็น</p>
-<pre class="language-text"><code>sensor-backup.txt</code></pre>
+<pre class="language-path"><code>sensor-backup.txt</code></pre>
 <p>จากนั้นแสดงโครงสร้างทั้งหมดด้วย</p>
 <pre class="language-bash"><code>tree ~/iot-project</code></pre>
 <hr>

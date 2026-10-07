@@ -55,7 +55,9 @@ pgrep -af node-red || nohup node-red &gt; ~/node-red.log 2&gt;&amp;1 &amp;</code
 <p>สร้าง Flow:</p>
 <pre class="language-text"><code>http in → function → http response</code></pre>
 <p>HTTP In:</p>
-<pre class="language-text"><code>GET /api/status</code></pre>
+<p>Method: <code>GET</code></p>
+<p>URL:</p>
+<pre class="language-url"><code>/api/status</code></pre>
 <p>Function:</p>
 <pre class="language-javascript"><code>msg.headers = {&quot;content-type&quot;:&quot;application/json&quot;};
 msg.payload = {
@@ -66,14 +68,14 @@ return msg;</code></pre>
 <p>ทดสอบ:</p>
 <pre class="language-bash"><code>curl http://127.0.0.1:1880/api/status</code></pre>
 <p>ทดสอบจาก Browser บน Windows/macOS:</p>
-<pre class="language-text"><code>http://localhost:1880/api/status</code></pre>
+<pre class="language-url"><code>http://localhost:1880/api/status</code></pre>
 <p>ถ้าเครื่องอื่นอยู่ใน LAN เดียวกัน:</p>
-<pre class="language-text"><code>http://IP-WINDOWS:1880/api/status</code></pre>
+<pre class="language-url"><code>http://IP-WINDOWS:1880/api/status</code></pre>
 <h2 id="html">HTML</h2>
 <p>สร้าง:</p>
 <pre class="language-text"><code>http in → template → http response</code></pre>
 <p>URL:</p>
-<pre class="language-text"><code>/</code></pre>
+<pre class="language-url"><code>/</code></pre>
 <p>Template:</p>
 <pre class="language-html"><code>&lt;!DOCTYPE html&gt;
 &lt;html&gt;
@@ -86,7 +88,7 @@ return msg;</code></pre>
 <p>ทดสอบ:</p>
 <pre class="language-bash"><code>curl http://127.0.0.1:1880/</code></pre>
 <p>จาก Browser บน Windows/macOS:</p>
-<pre class="language-text"><code>http://localhost:1880/</code></pre>
+<pre class="language-url"><code>http://localhost:1880/</code></pre>
 <h2 id="แบบฝึกหัด">แบบฝึกหัด</h2>
 <p>สร้าง <code>/api/device</code> คืน JSON ที่มี <code>device_id</code>, <code>temp</code>, <code>humi</code>, <code>light</code>, <code>status</code></p>
 <p><strong>LAB ถัดไป: LAB 20 - Integrated IoT Linux Stack</strong></p>

@@ -117,15 +117,21 @@ python mqtt_publisher.py</code></pre>
 curl http://127.0.0.1/api/logs
 curl -I http://127.0.0.1:1880</code></pre>
 <p>จาก Browser บน Windows/macOS:</p>
-<pre class="language-text"><code>http://localhost:8080
-http://localhost:8080/status.html
-http://localhost:1880</code></pre>
+<p>Nginx:</p>
+<pre class="language-url"><code>http://localhost:8080</code></pre>
+<p>IoT Device Status Log:</p>
+<pre class="language-url"><code>http://localhost:8080/status.html</code></pre>
+<p>Node-RED:</p>
+<pre class="language-url"><code>http://localhost:1880</code></pre>
 <p>จากเครื่องอื่นใน LAN:</p>
-<pre class="language-text"><code>http://IP-WINDOWS:8080
-http://IP-WINDOWS:1880</code></pre>
+<p>Nginx (แทน <code>IP-WINDOWS</code> ด้วย IP ของเครื่อง host):</p>
+<pre class="language-url"><code>http://IP-WINDOWS:8080</code></pre>
+<p>Node-RED (แทน <code>IP-WINDOWS</code> ด้วย IP ของเครื่อง host):</p>
+<pre class="language-url"><code>http://IP-WINDOWS:1880</code></pre>
 <p>สำหรับ MQTT client ที่อยู่นอก Container:</p>
-<pre class="language-text"><code>Broker: IP-WINDOWS
-Port: 1883</code></pre>
+<p>Broker (แทน <code>IP-WINDOWS</code> ด้วย IP ของเครื่อง host):</p>
+<pre class="language-plaintext"><code>IP-WINDOWS</code></pre>
+<p>Port: <code>1883</code></p>
 <h2 id="ตรวจ-process">ตรวจ Process</h2>
 <pre class="language-bash"><code>ps aux | grep nginx
 ps aux | grep mosquitto

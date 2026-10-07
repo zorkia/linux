@@ -60,9 +60,12 @@ pgrep mosquitto || sudo mosquitto -c /etc/mosquitto/mosquitto.conf -d</code></pr
   -m &#x27;{&quot;device_id&quot;:&quot;ESP32-001&quot;,&quot;location&quot;:&quot;Lab Room&quot;,&quot;temperature&quot;:30.5,&quot;humidity&quot;:70.2,&quot;status&quot;:&quot;NORMAL&quot;,&quot;note&quot;:&quot;topic design test&quot;}&#x27;</code></pre>
 <p>Payload ชุดนี้ตั้งใจให้ตรงกับตาราง <code>device_logs</code> จาก LAB 12 เพื่อให้ข้อมูลจาก MQTT สามารถบันทึกลง SQLite และแสดงบนเว็บเดียวกันได้</p>
 <h2 id="multi-device">Multi-device</h2>
-<pre class="language-text"><code>pkru/iot/001/data
-pkru/iot/002/data
-pkru/iot/003/data</code></pre>
+<p>อุปกรณ์ 001:</p>
+<pre class="language-mqtt"><code>pkru/iot/001/data</code></pre>
+<p>อุปกรณ์ 002:</p>
+<pre class="language-mqtt"><code>pkru/iot/002/data</code></pre>
+<p>อุปกรณ์ 003:</p>
+<pre class="language-mqtt"><code>pkru/iot/003/data</code></pre>
 <p>รับทั้งหมด:</p>
 <pre class="language-bash"><code>mosquitto_sub -h 127.0.0.1 -t &quot;pkru/iot/+/data&quot; -v</code></pre>
 <h2 id="status-command">Status / Command</h2>
@@ -70,9 +73,12 @@ pkru/iot/003/data</code></pre>
 mosquitto_sub -h 127.0.0.1 -t &quot;pkru/iot/001/cmd&quot; -v
 mosquitto_pub -h 127.0.0.1 -t &quot;pkru/iot/001/cmd&quot; -m &#x27;{&quot;led&quot;:&quot;ON&quot;}&#x27;</code></pre>
 <h2 id="topic-design">Topic Design</h2>
-<pre class="language-text"><code>pkru/iot/001/data
-pkru/iot/001/status
-pkru/iot/001/cmd</code></pre>
+<p>ข้อมูล:</p>
+<pre class="language-mqtt"><code>pkru/iot/001/data</code></pre>
+<p>สถานะ:</p>
+<pre class="language-mqtt"><code>pkru/iot/001/status</code></pre>
+<p>คำสั่ง:</p>
+<pre class="language-mqtt"><code>pkru/iot/001/cmd</code></pre>
 <h2 id="แบบฝึกหัด">แบบฝึกหัด</h2>
 <p>ออกแบบ Topic สำหรับ 3 devices และ JSON ที่มี <code>device_id</code>, <code>location</code>, <code>temperature</code>, <code>humidity</code>, <code>status</code>, <code>note</code></p>
 <p><strong>LAB ถัดไป: LAB 15 - Python MQTT Publisher</strong></p>

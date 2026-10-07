@@ -73,9 +73,9 @@ ss -tuln | grep :80</code></pre>
 <p>ทดสอบจากภายใน Container:</p>
 <pre class="language-bash"><code>curl http://127.0.0.1</code></pre>
 <p>ทดสอบจาก Browser บน Windows/macOS:</p>
-<pre class="language-text"><code>http://localhost:8080</code></pre>
+<pre class="language-url"><code>http://localhost:8080</code></pre>
 <p>ถ้าเครื่องอื่นอยู่ใน LAN เดียวกัน ให้ใช้ IP ของ Windows/macOS host:</p>
-<pre class="language-text"><code>http://IP-WINDOWS:8080</code></pre>
+<pre class="language-url"><code>http://IP-WINDOWS:8080</code></pre>
 <p>ถ้าเปิดจากเครื่องอื่นไม่ได้ ให้ตรวจสอบ Windows Firewall หรือ Firewall ของเครื่อง host ว่าอนุญาต port <code>8080</code> แล้วหรือยัง</p>
 <h2 id="web-root">Web Root</h2>
 <pre class="language-bash"><code>ls -la /var/www/html
@@ -92,7 +92,7 @@ sudo nano /var/www/html/index.html</code></pre>
 <p>ทดสอบ:</p>
 <pre class="language-bash"><code>curl http://127.0.0.1</code></pre>
 <p>จาก Browser บน Windows/macOS ให้ Refresh หน้า:</p>
-<pre class="language-text"><code>http://localhost:8080</code></pre>
+<pre class="language-url"><code>http://localhost:8080</code></pre>
 <h2 id="configuration">Configuration</h2>
 <pre class="language-bash"><code>ls /etc/nginx
 ls /etc/nginx/sites-enabled
@@ -112,8 +112,10 @@ Nginx
 <h3 id="ทำไมต้องใช้-nginx-proxy">ทำไมต้องใช้ Nginx Proxy</h3>
 <p>ถ้าเปิด Python API ตรง ๆ ผู้ใช้ต้องจำ URL และ port แยก เช่น <code>http://localhost:5000/api/logs</code> ในขณะที่หน้าเว็บอยู่ที่ <code>http://localhost:8080/status.html</code> ทำให้ระบบดูแยกเป็นสองส่วน</p>
 <p>การตั้งค่า Nginx Proxy ทำให้ Browser เรียกทุกอย่างผ่าน Web Server ตัวเดียว:</p>
-<pre class="language-text"><code>หน้าเว็บ        http://localhost:8080/status.html
-API            http://localhost:8080/api/logs</code></pre>
+<p>หน้าเว็บ:</p>
+<pre class="language-url"><code>http://localhost:8080/status.html</code></pre>
+<p>API:</p>
+<pre class="language-url"><code>http://localhost:8080/api/logs</code></pre>
 <p>Nginx จะรับ request ที่ขึ้นต้นด้วย <code>/api/</code> แล้วส่งต่อไปยัง Python API ภายใน Container:</p>
 <pre class="language-text"><code>Browser
   |
@@ -139,7 +141,7 @@ SQLite</code></pre>
 <p>สร้าง <code>/var/www/html/iot.html</code> แสดง Student ID, Hostname และข้อความ IoT Gateway แล้วทดสอบ:</p>
 <pre class="language-bash"><code>curl http://127.0.0.1/iot.html</code></pre>
 <p>จาก Browser บน Windows/macOS:</p>
-<pre class="language-text"><code>http://localhost:8080/iot.html</code></pre>
+<pre class="language-url"><code>http://localhost:8080/iot.html</code></pre>
 <p><strong>LAB ถัดไป: LAB 12 - SQLite Database</strong></p>
     </main>
   </div>

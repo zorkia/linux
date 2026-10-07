@@ -57,11 +57,14 @@ pgrep -af node-red || nohup node-red &gt; ~/node-red.log 2&gt;&amp;1 &amp;</code
 <p>ทุกบริการใน LAB นี้ทำงานอยู่ใน Container เดียวกัน ดังนั้น Node-RED ที่อยู่ใน Container ให้ตั้ง MQTT Broker เป็น <code>127.0.0.1:1883</code></p>
 <p>ถ้า MQTT client อยู่นอก Container เช่น Windows หรือเครื่องอื่นใน LAN ให้ใช้ <code>localhost:1883</code> หรือ <code>IP-WINDOWS:1883</code> ตาม Port Mapping ของ Docker แทน</p>
 <p>Broker ใน Node-RED:</p>
-<pre class="language-text"><code>Server: 127.0.0.1
-Port: 1883
-Topic: pkru/iot/+/data</code></pre>
+<p>Server:</p>
+<pre class="language-plaintext"><code>127.0.0.1</code></pre>
+<p>Port:</p>
+<pre class="language-plaintext"><code>1883</code></pre>
+<p>Topic ของ MQTT In:</p>
+<pre class="language-mqtt"><code>pkru/iot/+/data</code></pre>
 <p>เปิด Node-RED Editor จาก Browser บน Windows/macOS:</p>
-<pre class="language-text"><code>http://localhost:1880</code></pre>
+<pre class="language-url"><code>http://localhost:1880</code></pre>
 <p>สร้าง Flow:</p>
 <pre class="language-text"><code>mqtt in → json → function → debug</code></pre>
 <p>Function:</p>
