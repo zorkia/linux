@@ -14,6 +14,7 @@
   <div class="layout">
     <nav class="sidebar" aria-label="Site navigation">
       <a class="" href="../index.html">Docker Linux Lab</a>
+<a class="" href="../linux-lab-software-setup.html">เตรียมเครื่องมือสำหรับ Linux LAB</a>
 <a class="" href="00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
 <a class="" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
 <a class="" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
@@ -39,6 +40,10 @@
     <main class="content">
       <h1 id="lab-13-mosquitto-mqtt-broker">LAB 13 - Mosquitto MQTT Broker</h1>
 <nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="12-lab-12-sqlite-database.html">ก่อนหน้า: LAB 12 - SQLite Database</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="14-lab-14-mqtt-json-and-topic-design.html">ถัดไป: LAB 14 - MQTT JSON and Topic Design</a></nav>
+<aside class="callout callout-info">
+<div class="callout-title">เครื่องมือสำหรับ LAB นี้</div>
+<p><code>mosquitto</code> เป็น Broker ส่วน <code>mosquitto_pub</code> และ <code>mosquitto_sub</code> มาจาก <code>mosquitto-clients</code> ใช้ <code>nano</code>, <code>procps</code> (<code>ps</code>) และ <code>iproute2</code> (<code>ss</code>) เพื่อตั้งค่าและตรวจบริการด้วย ดู <a href="../linux-lab-software-setup.html">รวมคำสั่งและการติดตั้งล่วงหน้า</a></p>
+</aside>
 <h2 id="วัตถุประสงค์">วัตถุประสงค์</h2>
 <p>ติดตั้ง MQTT Broker และ Client Tools เพื่อจำลอง Raspberry Pi MQTT Server</p>
 <blockquote>
@@ -48,7 +53,7 @@ LAB นี้ทดสอบ MQTT ภายใน Container ด้วย <code>1
 <pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
 <pre class="language-bash"><code>su - piuser
 sudo apt update
-sudo apt install -y mosquitto mosquitto-clients</code></pre>
+sudo apt install -y mosquitto mosquitto-clients nano procps iproute2</code></pre>
 <h2 id="เปิด-listener-สำหรับ-lab">เปิด Listener สำหรับ LAB</h2>
 <p>สร้างไฟล์ config สำหรับ LAB:</p>
 <pre class="language-bash"><code>sudo nano /etc/mosquitto/conf.d/lab-listener.conf</code></pre>

@@ -14,6 +14,7 @@
   <div class="layout">
     <nav class="sidebar" aria-label="Site navigation">
       <a class="" href="../index.html">Docker Linux Lab</a>
+<a class="" href="../linux-lab-software-setup.html">เตรียมเครื่องมือสำหรับ Linux LAB</a>
 <a class="" href="00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
 <a class="" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
 <a class="" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
@@ -39,6 +40,10 @@
     <main class="content">
       <h1 id="lab-06-linux-networking">LAB 06 - Linux Networking</h1>
 <nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="05-lab-05-linux-processes-และ-resource-monitoring.html">ก่อนหน้า: LAB 05 - Linux Processes และ Resource Monitoring</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="07-lab-07-linux-pipes-redirects-และ-text-processing.html">ถัดไป: LAB 07 - Linux Pipes, Redirects และ Text Processing</a></nav>
+<aside class="callout callout-info">
+<div class="callout-title">เครื่องมือสำหรับ LAB นี้</div>
+<p>ใช้ <code>ip</code>, <code>ss</code> จาก <code>iproute2</code>, <code>ping</code> จาก <code>iputils-ping</code>, <code>dig</code> จาก <code>dnsutils</code>, <code>nc</code> จาก <code>netcat-openbsd</code> และ <code>curl</code> พร้อม <code>ca-certificates</code> สำหรับ HTTPS ดู <a href="../linux-lab-software-setup.html">รวมคำสั่งและการติดตั้งล่วงหน้า</a></p>
+</aside>
 <h2 id="วัตถุประสงค์">วัตถุประสงค์</h2>
 <p>เข้าใจ Interface, IP Address, Route, DNS, Port และการทดสอบ Network ภายใน Docker โดยเชื่อมโยงกับ Raspberry Pi</p>
 <blockquote>
@@ -49,7 +54,7 @@
 <pre class="language-bash"><code>su - piuser</code></pre>
 <p>ติดตั้งเครื่องมือ:</p>
 <pre class="language-bash"><code>sudo apt update
-sudo apt install -y iproute2 iputils-ping curl dnsutils netcat-openbsd</code></pre>
+sudo apt install -y iproute2 iputils-ping curl ca-certificates dnsutils netcat-openbsd</code></pre>
 <h2 id="1-hostname">1. Hostname</h2>
 <pre class="language-bash"><code>hostname</code></pre>
 <h2 id="2-interface-ip">2. Interface/IP</h2>

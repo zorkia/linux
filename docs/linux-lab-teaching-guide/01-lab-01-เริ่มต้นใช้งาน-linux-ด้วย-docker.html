@@ -14,6 +14,7 @@
   <div class="layout">
     <nav class="sidebar" aria-label="Site navigation">
       <a class="" href="../index.html">Docker Linux Lab</a>
+<a class="" href="../linux-lab-software-setup.html">เตรียมเครื่องมือสำหรับ Linux LAB</a>
 <a class="" href="00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
 <a class="active" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
 <a class="" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
@@ -39,6 +40,10 @@
     <main class="content">
       <h1 id="lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</h1>
 <nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="00-linux-lab-teaching-guide-hub.html">ก่อนหน้า: Linux Lab Teaching Guide - Hub</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">ถัดไป: LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a></nav>
+<aside class="callout callout-info">
+<div class="callout-title">เครื่องมือสำหรับ LAB นี้</div>
+<p>ติดตั้ง <code>sudo</code>, <code>adduser</code>, <code>nano</code>, <code>iproute2</code> (<code>ip</code>) และ <code>iputils-ping</code> (<code>ping</code>) ตามขั้นตอนด้านล่าง หลังสร้างผู้ใช้แล้วสามารถ <a href="../linux-lab-software-setup.html">ติดตั้งเครื่องมือสำหรับทุก LAB ล่วงหน้า</a> ได้</p>
+</aside>
 <h2 id="1-วัตถุประสงค์">1. วัตถุประสงค์</h2>
 <p>LAB นี้ใช้ Docker เพื่อสร้างสภาพแวดล้อม Debian Linux สำหรับฝึกใช้งาน Linux ก่อนนำความรู้ไปใช้กับ Raspberry Pi จริง</p>
 <p>เมื่อจบ LAB นักศึกษาจะสามารถ</p>
@@ -178,6 +183,13 @@ localhost:1883     ---&gt;  1883    Mosquitto MQTT</code></pre>
 <pre class="language-bash"><code>sudo whoami</code></pre>
 <p>ผลลัพธ์ควรเป็น</p>
 <pre class="language-text"><code>root</code></pre>
+<hr>
+<h2 id="13-1-เตรียมเครื่องมือพื้นฐานสำหรับแล็บถัดไป">13.1 เตรียมเครื่องมือพื้นฐานสำหรับแล็บถัดไป</h2>
+<p>หลังทดสอบ <code>sudo</code> สำเร็จแล้ว ติดตั้งเครื่องมือสำหรับ LAB 02-09 ไว้ก่อน เพื่อให้คำสั่งพร้อมใช้ตั้งแต่เริ่มแล็บ:</p>
+<pre class="language-bash"><code>sudo apt update
+sudo apt install -y nano less tree file curl ca-certificates procps htop iproute2 iputils-ping dnsutils netcat-openbsd python3</code></pre>
+<p><code>procps</code> เพิ่มคำสั่ง <code>ps</code>, <code>top</code>, <code>pgrep</code>, <code>pkill</code>, <code>free</code> และ <code>uptime</code> ที่ใช้ใน LAB 05 ส่วน <code>python3</code> เตรียมไว้สำหรับตรวจตำแหน่งคำสั่งใน LAB 08 หากต้องการติดตั้งบริการและไลบรารีของ LAB 10-20 ล่วงหน้าด้วย ให้ใช้ <a href="../linux-lab-software-setup.html">หน้ารวมการติดตั้งเครื่องมือ</a></p>
+<p>ขั้นตอนติดตั้ง <code>nano</code>, <code>iproute2</code> และ <code>iputils-ping</code> ด้านล่างยังทำตามได้ แม้ติดตั้งจากคำสั่งรวมแล้ว</p>
 <hr>
 <h2 id="14-ติดตั้ง-nano">14. ติดตั้ง Nano</h2>
 <pre class="language-bash"><code>sudo apt install -y nano</code></pre>

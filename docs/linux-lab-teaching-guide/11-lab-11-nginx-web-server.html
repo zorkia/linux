@@ -14,6 +14,7 @@
   <div class="layout">
     <nav class="sidebar" aria-label="Site navigation">
       <a class="" href="../index.html">Docker Linux Lab</a>
+<a class="" href="../linux-lab-software-setup.html">เตรียมเครื่องมือสำหรับ Linux LAB</a>
 <a class="" href="00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
 <a class="" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
 <a class="" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
@@ -39,6 +40,10 @@
     <main class="content">
       <h1 id="lab-11-nginx-web-server">LAB 11 - Nginx Web Server</h1>
 <nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="10-lab-10-python-บน-linux.html">ก่อนหน้า: LAB 10 - Python บน Linux</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="12-lab-12-sqlite-database.html">ถัดไป: LAB 12 - SQLite Database</a></nav>
+<aside class="callout callout-info">
+<div class="callout-title">เครื่องมือสำหรับ LAB นี้</div>
+<p>ใช้ <code>nginx</code>, <code>curl</code>, <code>nano</code>, <code>procps</code> (<code>ps</code>, <code>pgrep</code>) และ <code>iproute2</code> (<code>ss</code>) ดู <a href="../linux-lab-software-setup.html">รวมคำสั่งและการติดตั้งล่วงหน้า</a></p>
+</aside>
 <h2 id="วัตถุประสงค์">วัตถุประสงค์</h2>
 <p>ติดตั้งและใช้งาน Nginx ภายใน Debian Container เพื่อเข้าใจ Web Server บน Raspberry Pi</p>
 <blockquote>
@@ -49,7 +54,7 @@ LAB 01 ควรสร้าง Container <code>rpi-lab</code> พร้อม <
 <pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
 <pre class="language-bash"><code>su - piuser
 sudo apt update
-sudo apt install -y nginx curl procps iproute2
+sudo apt install -y nginx curl nano procps iproute2
 sudo nginx -v</code></pre>
 <blockquote>
 <code>nginx</code> อยู่ใน <code>/usr/sbin/nginx</code> ซึ่ง user ธรรมดาอาจไม่มี <code>/usr/sbin</code> อยู่ใน <code>PATH</code> จึงใช้ <code>sudo nginx -v</code> เพื่อตรวจ version

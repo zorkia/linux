@@ -14,6 +14,7 @@
   <div class="layout">
     <nav class="sidebar" aria-label="Site navigation">
       <a class="" href="../index.html">Docker Linux Lab</a>
+<a class="" href="../linux-lab-software-setup.html">เตรียมเครื่องมือสำหรับ Linux LAB</a>
 <a class="" href="00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
 <a class="" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
 <a class="" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
@@ -39,6 +40,10 @@
     <main class="content">
       <h1 id="lab-12-sqlite-database">LAB 12 - SQLite Database</h1>
 <nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="11-lab-11-nginx-web-server.html">ก่อนหน้า: LAB 11 - Nginx Web Server</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="13-lab-13-mosquitto-mqtt-broker.html">ถัดไป: LAB 13 - Mosquitto MQTT Broker</a></nav>
+<aside class="callout callout-info">
+<div class="callout-title">เครื่องมือสำหรับ LAB นี้</div>
+<p>ใช้ <code>sqlite3</code>, <code>python3</code>, <code>nano</code>, <code>curl</code> และ Nginx ที่ตั้งค่าใน LAB 11 โมดูล Python <code>sqlite3</code> และ <code>http.server</code> ไม่ต้องติดตั้งด้วย pip ดู <a href="../linux-lab-software-setup.html">รวมคำสั่งและการติดตั้งล่วงหน้า</a></p>
+</aside>
 <h2 id="วัตถุประสงค์">วัตถุประสงค์</h2>
 <p>สร้างฐานข้อมูล Sensor ด้วย SQLite เพื่อเตรียมใช้กับ IoT Gateway</p>
 <p>ใน LAB นี้จะเริ่มจากการใช้ SQLite ด้วยคำสั่งพื้นฐาน แล้วต่อยอดเป็นตัวอย่างงานจริงขนาดเล็ก: เว็บบันทึกสถานะอุปกรณ์ IoT ลง SQLite และแสดงข้อมูลล่าสุดบนเว็บแบบ real-time</p>
@@ -46,7 +51,7 @@
 <pre class="language-powershell"><code>docker start -ai rpi-lab</code></pre>
 <pre class="language-bash"><code>su - piuser
 sudo apt update
-sudo apt install -y sqlite3 python3
+sudo apt install -y sqlite3 python3 nano curl nginx
 sqlite3 --version
 mkdir -p ~/iot-data
 cd ~/iot-data

@@ -14,6 +14,7 @@
   <div class="layout">
     <nav class="sidebar" aria-label="Site navigation">
       <a class="" href="../index.html">Docker Linux Lab</a>
+<a class="" href="../linux-lab-software-setup.html">เตรียมเครื่องมือสำหรับ Linux LAB</a>
 <a class="" href="00-linux-lab-teaching-guide-hub.html">Linux Lab Teaching Guide - Hub</a>
 <a class="" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a>
 <a class="active" href="02-lab-02-linux-filesystem-files-directories-และ-text-editor.html">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</a>
@@ -39,6 +40,10 @@
     <main class="content">
       <h1 id="lab-02-linux-filesystem-files-directories-และ-text-editor">LAB 02 - Linux Filesystem, Files, Directories และ Text Editor</h1>
 <nav class="page-sequence" aria-label="Page sequence"><a class="prev" href="01-lab-01-เริ่มต้นใช้งาน-linux-ด้วย-docker.html">ก่อนหน้า: LAB 01 - เริ่มต้นใช้งาน Linux ด้วย Docker</a><a class="home" href="../index.html">กลับหน้าแรก</a><a class="next" href="03-lab-03-linux-users-groups-ownership-และ-permissions.html">ถัดไป: LAB 03 - Linux Users, Groups, Ownership และ Permissions</a></nav>
+<aside class="callout callout-info">
+<div class="callout-title">เครื่องมือสำหรับ LAB นี้</div>
+<p>ใช้ <code>nano</code>, <code>less</code>, <code>tree</code> และ <code>file</code> จากแพ็กเกจชื่อเดียวกัน หากยังไม่ได้เตรียมจาก LAB 01 ให้ดู <a href="../linux-lab-software-setup.html">รวมคำสั่งและการติดตั้งล่วงหน้า</a> ขั้นตอนติดตั้ง <code>less</code>, <code>tree</code> และ <code>file</code> จะย้ำเมื่อถึงหัวข้อที่ใช้งาน</p>
+</aside>
 <h2 id="1-วัตถุประสงค์">1. วัตถุประสงค์</h2>
 <p>LAB นี้ฝึกการใช้งานระบบไฟล์ของ Linux ภายใน Docker Container <code>rpi-lab</code> ที่สร้างจาก LAB 01 เพื่อเตรียมพื้นฐานสำหรับการใช้งาน Raspberry Pi จริง</p>
 <p>เมื่อจบ LAB นักศึกษาจะสามารถ</p>
@@ -77,6 +82,9 @@ LAB นี้เน้น Windows เป็นหลัก โดยใช้ Wi
           └── /home/piuser</code></pre>
 <p>LAB นี้ใช้ Container เดิมจาก LAB 01</p>
 <p>ไม่ต้องสร้าง Container ใหม่</p>
+<p>หลังเข้า Container และเปลี่ยนเป็น <code>piuser</code> แล้ว ถ้ายังไม่ได้เตรียมเครื่องมือจาก LAB 01 ให้ติดตั้งก่อนเริ่ม:</p>
+<pre class="language-bash"><code>sudo apt update
+sudo apt install -y nano less tree file</code></pre>
 <hr>
 <h2 id="3-เปิด-docker-desktop">3. เปิด Docker Desktop</h2>
 <p>เปิด Docker Desktop และรอจน Docker Engine พร้อมใช้งาน</p>
